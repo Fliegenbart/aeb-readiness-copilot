@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model EvidenceCapsule {
+  id                   String   @id @default(cuid())
+  reference            String   @unique
+  shipper              String
+  consignee            String
+  readinessScore       Int
+  status               String
+  missingEvidenceJson  String
+  contradictionsJson   String
+  invoiceValue         Float
+  packingGrossWeightKg Float
+  erpGrossWeightKg     Float
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
