@@ -5,7 +5,7 @@
   "description": "Pitchable MVP for AEB-ready trade evidence readiness checks.",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run db:push && npm run db:seed && next build",
     "test": "vitest run",
     "db:push": "DATABASE_URL=file:./dev.db RUST_LOG=info prisma db push --skip-generate && DATABASE_URL=file:./dev.db prisma generate",
     "db:seed": "DATABASE_URL=file:./dev.db prisma db seed",

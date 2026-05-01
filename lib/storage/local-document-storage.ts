@@ -1,8 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { mkdir, rm, writeFile } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 
-const uploadRoot = path.join(process.cwd(), "storage", "uploads");
+const uploadRoot = process.env.VERCEL
+  ? path.join(os.tmpdir(), "aeb-readiness-uploads")
+  : path.join(process.cwd(), "storage", "uploads");
 
 export type StoredUploadedFile = {
   filename: string;
