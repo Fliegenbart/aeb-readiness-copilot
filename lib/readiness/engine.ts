@@ -7,6 +7,7 @@ import type {
   ReadinessStatus,
   RemediationTaskStatus,
 } from "@/lib/domain/types";
+import { SCORE_THRESHOLDS, clampScoreToPercent } from "@/config/scoreThresholds";
 
 export type ReadinessReason = {
   code: string;
@@ -798,7 +799,7 @@ function calculateOverallScore(
     return sum;
   }, 0);
 
-  return clampScore(Math.round(average - penalty));
+  return clampScoreToPercent(Math.round(average - penalty));
 }
 
 function statusFromReasons(reasons: ReadinessReason[]): ReadinessStatus {
@@ -822,11 +823,15 @@ function scoreForStatus(
   }
 
   if (status === "blocked") {
-    return clampScore(45 - reasons.length * 5);
+    return clampScoreToPercent(
+      SCORE_THRESHOLDS.warning - 1 - reasons.length * 5,
+    );
   }
 
   if (status === "warning") {
-    return clampScore(82 - reasons.length * 4);
+    return clampScoreToPercent(
+      SCORE_THRESHOLDS.ready - 1 - Math.max(0, reasons.length - 1) * 4,
+    );
   }
 
   return 100;
@@ -1009,10 +1014,6 @@ function riskQuestionnaireIsStale(context: ReadinessContext): boolean {
   const twelveMonthsMs = 365 * 24 * 60 * 60 * 1000;
 
   return ageMs > twelveMonthsMs;
-}
-
-function clampScore(score: number): number {
-  return Math.min(100, Math.max(0, score));
 }
 
 function titleForReason(reasonCode: string): string {

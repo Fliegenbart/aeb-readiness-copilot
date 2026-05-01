@@ -58,6 +58,7 @@ describe("seeded Evidence Capsules", () => {
 
     const capsules = await prisma.evidenceCapsule.findMany({
       include: {
+        auditEvents: { orderBy: { createdAt: "asc" } },
         contradictions: true,
         missingEvidence: true,
         readinessChecks: true,
@@ -81,6 +82,18 @@ describe("seeded Evidence Capsules", () => {
       "preferential_origin_statement",
     );
     expect(capsules[4].readinessChecks[0].target).toBe("EXPORT_CONTROLS");
+
+    for (const capsule of capsules) {
+      expect(capsule.auditEvents.length).toBeGreaterThanOrEqual(5);
+
+      const timestamps = capsule.auditEvents.map((event) =>
+        event.createdAt.getTime(),
+      );
+
+      expect(timestamps).toEqual(
+        [...timestamps].sort((left, right) => left - right),
+      );
+    }
   });
 
   it("recomputes stored readiness checks and audit events", async () => {
@@ -111,6 +124,7 @@ describe("seeded Evidence Capsules", () => {
       prisma.auditEvent.findMany({
         where: {
           capsuleId,
+          actor: "vitest",
           eventType: {
             in: ["documents.analyzed", "readiness.computed", "tasks.created"],
           },

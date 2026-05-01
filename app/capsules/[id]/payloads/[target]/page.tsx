@@ -1,4 +1,3 @@
-import type { ReadinessStatus } from "@prisma/client";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -13,10 +12,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AppShell } from "@/components/app-shell";
+import { SeverityBadge, StatusBadge } from "@/components/status-badge";
 import { parseAebTarget } from "@/lib/aeb";
 import { getPayloadPreviewForApi } from "@/lib/api/capsule-service";
 import { prisma } from "@/lib/db/prisma";
 import { getCapsuleDetail } from "@/lib/demo/dashboard-data";
+import { formatDateTime, formatStatus, formatTarget } from "@/lib/ui/format";
 
 export const dynamic = "force-dynamic";
 
@@ -65,7 +66,7 @@ export default async function PayloadPreviewPage({
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <StatusBadge status={preview.readinessStatus} />
+            <StatusBadge size="md" status={preview.readinessStatus} />
             <Link
               href={apiUrl}
               className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-slate-300 px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
@@ -97,7 +98,7 @@ export default async function PayloadPreviewPage({
           />
           <MetricCard
             label="Generated"
-            value={formatDate(new Date(preview.generatedAt))}
+            value={formatDateTime(new Date(preview.generatedAt))}
             detail="Local demo timestamp"
             icon={FileJson}
           />
@@ -244,61 +245,4 @@ function IssueRow({
       ) : null}
     </div>
   );
-}
-
-function StatusBadge({ status }: { status: ReadinessStatus }) {
-  const classes: Record<ReadinessStatus, string> = {
-    ready: "border-emerald-200 bg-emerald-50 text-emerald-800",
-    warning: "border-amber-200 bg-amber-50 text-amber-800",
-    blocked: "border-red-200 bg-red-50 text-red-800",
-    notApplicable: "border-slate-200 bg-slate-50 text-slate-700",
-  };
-
-  return (
-    <span
-      className={`inline-flex h-10 items-center rounded-md border px-3 text-sm font-semibold ${classes[status]}`}
-    >
-      {formatStatus(status)}
-    </span>
-  );
-}
-
-function SeverityBadge({ severity }: { severity: "warning" | "blocking" }) {
-  const classes = {
-    warning: "border-amber-200 bg-amber-50 text-amber-800",
-    blocking: "border-red-200 bg-red-50 text-red-800",
-  };
-
-  return (
-    <span
-      className={`inline-flex w-fit rounded-md border px-2 py-1 text-xs font-semibold ${classes[severity]}`}
-    >
-      {formatStatus(severity)}
-    </span>
-  );
-}
-
-function formatTarget(value: string): string {
-  return value
-    .toLowerCase()
-    .split("_")
-    .map((word) => word[0].toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
-function formatStatus(value: string): string {
-  return value
-    .replace(/([A-Z])/g, " $1")
-    .trim()
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
-function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("en", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
 }

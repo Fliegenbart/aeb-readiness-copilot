@@ -1,4 +1,3 @@
-import type { AebTarget, ReadinessStatus } from "@prisma/client";
 import {
   AlertTriangle,
   ArrowRight,
@@ -14,9 +13,11 @@ import {
 import Link from "next/link";
 
 import { AppShell } from "@/components/app-shell";
+import { SeverityBadge, StatusBadge } from "@/components/status-badge";
 import { prisma } from "@/lib/db/prisma";
 import type { EvidenceCapsuleWithRelations } from "@/lib/domain/types";
 import { buildPitchDemoFlow } from "@/lib/pitch/demo-flow";
+import { formatStatus, formatTarget } from "@/lib/ui/format";
 import { resetPitchDemoDataAction } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -462,7 +463,7 @@ function ExceptionPanel({
                 <p className="text-sm font-semibold text-slate-950">
                   {item.label}
                 </p>
-                <SeverityBadge severity={item.severity} />
+                <SeverityBadge className="shrink-0" severity={item.severity} />
               </div>
               <p className="mt-2 text-sm leading-6 text-slate-600">
                 {item.detail}
@@ -484,53 +485,4 @@ function Meta({ label, value }: { label: string; value: string }) {
       <dd className="mt-1 font-semibold text-white">{value}</dd>
     </div>
   );
-}
-
-function StatusBadge({ status }: { status: ReadinessStatus | string }) {
-  const classes: Record<string, string> = {
-    ready: "border-emerald-200 bg-emerald-50 text-emerald-800",
-    warning: "border-amber-200 bg-amber-50 text-amber-800",
-    blocked: "border-red-200 bg-red-50 text-red-800",
-    notApplicable: "border-slate-200 bg-slate-50 text-slate-700",
-  };
-
-  return (
-    <span
-      className={`inline-flex w-fit rounded-md border px-2 py-1 text-xs font-semibold ${classes[status] ?? classes.notApplicable}`}
-    >
-      {formatStatus(status)}
-    </span>
-  );
-}
-
-function SeverityBadge({ severity }: { severity: string }) {
-  const classes: Record<string, string> = {
-    blocking: "border-red-200 bg-red-50 text-red-800",
-    warning: "border-amber-200 bg-amber-50 text-amber-800",
-    info: "border-slate-200 bg-slate-50 text-slate-700",
-  };
-
-  return (
-    <span
-      className={`shrink-0 rounded-md border px-2 py-1 text-xs font-semibold ${classes[severity] ?? classes.info}`}
-    >
-      {formatStatus(severity)}
-    </span>
-  );
-}
-
-function formatTarget(target: AebTarget | string): string {
-  return target
-    .toLowerCase()
-    .split("_")
-    .map((word) => word[0].toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
-function formatStatus(value: string): string {
-  return value
-    .replace(/([A-Z])/g, " $1")
-    .replace(/_/g, " ")
-    .trim()
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }

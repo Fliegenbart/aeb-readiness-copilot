@@ -1,4 +1,4 @@
-import type { AebTarget, CapsuleStatus, ReadinessStatus } from "@prisma/client";
+import type { AebTarget, CapsuleStatus } from "@prisma/client";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -12,11 +12,23 @@ import Link from "next/link";
 
 import { AppShell } from "@/components/app-shell";
 import { DashboardCard } from "@/components/dashboard-card";
+import { StatusBadge } from "@/components/status-badge";
+import { WorkflowTanks } from "@/components/WorkflowTanks";
+import {
+  SCORE_THRESHOLD_TOOLTIP,
+  clampScoreToPercent,
+  getScoreBand,
+} from "@/config/scoreThresholds";
 import {
   getDemoDashboardData,
   type DemoDashboardCapsule,
   type DemoDashboardFilters,
 } from "@/lib/demo/dashboard-data";
+import {
+  WORKFLOW_TARGETS,
+  buildWorkflowTanks,
+} from "@/lib/readiness/workflow-tanks";
+import { formatDateTime, formatStatus, formatTarget } from "@/lib/ui/format";
 
 export const dynamic = "force-dynamic";
 
@@ -32,16 +44,7 @@ const statusOptions: CapsuleStatus[] = [
   "ready",
 ];
 
-const targetOptions: AebTarget[] = [
-  "CUSTOMS_BROKER_INTEGRATION",
-  "CUSTOMS_MANAGEMENT",
-  "PRODUCT_CLASSIFICATION",
-  "EXPORT_CONTROLS",
-  "COMPLIANCE_SCREENING",
-  "LICENSE_MANAGEMENT",
-  "RISK_ASSESSMENT",
-  "CARRIER_CONNECT",
-];
+const targetOptions: AebTarget[] = WORKFLOW_TARGETS;
 
 export default async function DemoPage({ searchParams }: DemoPageProps) {
   const params = await searchParams;
@@ -206,7 +209,7 @@ export default async function DemoPage({ searchParams }: DemoPageProps) {
             <EmptyState hasFilters={activeFilterCount > 0} />
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[1080px] border-collapse text-left text-sm">
+              <table className="w-full min-w-[1160px] border-collapse text-left text-sm">
                 <thead className="bg-slate-50 text-xs uppercase tracking-[0.12em] text-slate-500">
                   <tr>
                     <th className="px-4 py-3 font-semibold">Capsule</th>
@@ -214,6 +217,7 @@ export default async function DemoPage({ searchParams }: DemoPageProps) {
                     <th className="px-4 py-3 font-semibold">Destination</th>
                     <th className="px-4 py-3 font-semibold">Incoterm</th>
                     <th className="px-4 py-3 font-semibold">Score</th>
+                    <th className="px-4 py-3 font-semibold">Workflows</th>
                     <th className="px-4 py-3 font-semibold">Status</th>
                     <th className="px-4 py-3 font-semibold">Top blocker</th>
                     <th className="px-4 py-3 font-semibold">Updated</th>
@@ -246,13 +250,19 @@ export default async function DemoPage({ searchParams }: DemoPageProps) {
                         <Score value={capsule.overallReadinessScore} />
                       </td>
                       <td className="px-4 py-3">
-                        <StatusBadge status={capsule.status} />
+                        <WorkflowTanks
+                          size="sm"
+                          workflows={buildWorkflowTanks(capsule.readinessChecks)}
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <StatusBadge labelStyle="aviation" status={capsule.status} />
                       </td>
                       <td className="max-w-[280px] px-4 py-3 text-slate-700">
                         {topBlocker(capsule)}
                       </td>
                       <td className="px-4 py-3 text-slate-600">
-                        {formatDate(capsule.updatedAt)}
+                        {formatDateTime(latestAuditEventDate(capsule))}
                       </td>
                     </tr>
                   ))}
@@ -292,35 +302,22 @@ function EmptyState({ hasFilters }: { hasFilters: boolean }) {
 }
 
 function Score({ value }: { value: number }) {
+  const clampedValue = clampScoreToPercent(value);
+
   return (
-    <div className="flex items-center gap-3">
+    <div
+      aria-label={`Score ${value} percent. ${SCORE_THRESHOLD_TOOLTIP}`}
+      className="flex items-center gap-3"
+      title={SCORE_THRESHOLD_TOOLTIP}
+    >
       <span className="w-10 text-sm font-semibold text-slate-950">{value}%</span>
       <div className="h-2 w-24 rounded-full bg-slate-100">
         <div
           className={`h-2 rounded-full ${scoreColor(value)}`}
-          style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
+          style={{ width: `${clampedValue}%` }}
         />
       </div>
     </div>
-  );
-}
-
-function StatusBadge({ status }: { status: CapsuleStatus | ReadinessStatus }) {
-  const classes: Record<string, string> = {
-    ready: "border-emerald-200 bg-emerald-50 text-emerald-800",
-    warning: "border-amber-200 bg-amber-50 text-amber-800",
-    blocked: "border-red-200 bg-red-50 text-red-800",
-    notApplicable: "border-slate-200 bg-slate-50 text-slate-700",
-    draft: "border-slate-200 bg-slate-50 text-slate-700",
-    analyzing: "border-blue-200 bg-blue-50 text-blue-800",
-  };
-
-  return (
-    <span
-      className={`inline-flex rounded-md border px-2 py-1 text-xs font-semibold ${classes[status]}`}
-    >
-      {formatStatus(status)}
-    </span>
   );
 }
 
@@ -378,38 +375,20 @@ function topBlocker(capsule: DemoDashboardCapsule): string {
   return warningContradiction?.description ?? "None";
 }
 
+function latestAuditEventDate(capsule: DemoDashboardCapsule): Date {
+  return capsule.auditEvents[0]?.createdAt ?? capsule.updatedAt;
+}
+
 function scoreColor(value: number): string {
-  if (value >= 85) {
+  const band = getScoreBand(value);
+
+  if (band === "ready") {
     return "bg-emerald-500";
   }
 
-  if (value >= 60) {
+  if (band === "warning") {
     return "bg-amber-500";
   }
 
   return "bg-red-500";
-}
-
-function formatStatus(status: string): string {
-  return status
-    .replace(/([A-Z])/g, " $1")
-    .replace(/_/g, " ")
-    .trim()
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
-function formatTarget(target: AebTarget): string {
-  return target
-    .toLowerCase()
-    .split("_")
-    .map((word) => word[0].toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
-function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("en", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date);
 }

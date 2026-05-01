@@ -39,6 +39,7 @@ export async function getDemoDashboardData(filters: DemoDashboardFilters) {
     prisma.evidenceCapsule.findMany({
       where,
       include: {
+        auditEvents: { orderBy: { createdAt: "desc" } },
         contradictions: true,
         missingEvidence: true,
         readinessChecks: true,
@@ -61,7 +62,12 @@ export async function getDemoDashboardData(filters: DemoDashboardFilters) {
   ]);
 
   return {
-    capsules,
+    capsules: [...capsules].sort(
+      (left, right) =>
+        latestAuditEventDate(right).getTime() -
+          latestAuditEventDate(left).getTime() ||
+        left.capsuleNumber.localeCompare(right.capsuleNumber),
+    ),
     destinationCountries: destinationRows
       .map((row) => row.destinationCountry)
       .filter((country) => country && country !== "Unknown"),
@@ -91,6 +97,12 @@ export async function getDemoDashboardData(filters: DemoDashboardFilters) {
       ),
     },
   };
+}
+
+function latestAuditEventDate(
+  capsule: { auditEvents?: Array<{ createdAt: Date }>; updatedAt: Date },
+) {
+  return capsule.auditEvents?.[0]?.createdAt ?? capsule.updatedAt;
 }
 
 export async function getCapsuleDetail(id: string) {

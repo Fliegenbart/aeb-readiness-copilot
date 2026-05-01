@@ -1,4 +1,4 @@
-import type { AebTarget, CapsuleStatus, ReadinessStatus } from "@prisma/client";
+import type { AebTarget } from "@prisma/client";
 import {
   ArrowLeft,
   CircleCheck,
@@ -15,10 +15,29 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AppShell } from "@/components/app-shell";
+import { AuditTimeline } from "@/components/audit-timeline";
+import { CapsuleIssues } from "@/components/capsule-issues";
+import { EvidenceMap } from "@/components/EvidenceMap";
+import { StatusBadge } from "@/components/status-badge";
+import { WorkflowTanksNavigator } from "@/components/WorkflowTanksNavigator";
+import {
+  SCORE_THRESHOLD_TOOLTIP,
+  clampScoreToPercent,
+} from "@/config/scoreThresholds";
 import { buildAebPayloadPreview } from "@/lib/aeb";
 import { getCapsuleDetail } from "@/lib/demo/dashboard-data";
 import type { EvidenceCapsuleWithRelations } from "@/lib/domain/types";
+import {
+  WORKFLOW_TARGETS,
+  buildWorkflowTanks,
+  workflowRowId,
+} from "@/lib/readiness/workflow-tanks";
 import { generateEmailDraftForTask } from "@/lib/remediation/email-drafts";
+import {
+  formatDateTime,
+  formatStatus,
+  formatTarget,
+} from "@/lib/ui/format";
 import {
   dismissRemediationTaskAction,
   recomputeCapsuleReadinessAction,
@@ -32,17 +51,6 @@ type CapsuleDetailPageProps = {
   params: Promise<{ id: string }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
-
-const AEB_TARGETS: AebTarget[] = [
-  "CUSTOMS_BROKER_INTEGRATION",
-  "CUSTOMS_MANAGEMENT",
-  "PRODUCT_CLASSIFICATION",
-  "EXPORT_CONTROLS",
-  "COMPLIANCE_SCREENING",
-  "LICENSE_MANAGEMENT",
-  "RISK_ASSESSMENT",
-  "CARRIER_CONNECT",
-];
 
 export default async function CapsuleDetailPage({
   params,
@@ -61,6 +69,8 @@ export default async function CapsuleDetailPage({
   const selectedPayloadTarget = parsePayloadTarget(
     single(resolvedSearchParams?.payload),
   );
+  const workflowTanks = buildWorkflowTanks(capsule.readinessChecks);
+
   return (
     <AppShell>
       <main className="mx-auto w-full max-w-7xl px-5 py-8">
@@ -83,7 +93,7 @@ export default async function CapsuleDetailPage({
             <form action={recomputeCapsuleReadinessAction.bind(null, capsule.id)}>
               <button className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-slate-950 px-4 text-sm font-semibold text-white transition hover:bg-slate-800">
                 <RefreshCw aria-hidden="true" size={16} />
-                Recompute Readiness
+                Run pre-flight check
               </button>
             </form>
           </div>
@@ -103,16 +113,28 @@ export default async function CapsuleDetailPage({
                 <Meta label="Destination" value={capsule.destinationCountry} />
                 <Meta label="Incoterm" value={capsule.incoterm} />
               </dl>
+              <div className="mt-6 border-t border-slate-100 pt-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  Readiness across workflows
+                </p>
+                <div className="mt-3 overflow-x-auto pb-1">
+                  <WorkflowTanksNavigator workflows={workflowTanks} />
+                </div>
+              </div>
             </div>
             <div className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 lg:min-w-56">
-              <StatusBadge status={capsule.status} />
-              <div>
+              <StatusBadge labelStyle="aviation" status={capsule.status} />
+              <div
+                aria-label={`Overall score ${capsule.overallReadinessScore} percent. ${SCORE_THRESHOLD_TOOLTIP}`}
+                title={SCORE_THRESHOLD_TOOLTIP}
+              >
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
                   Overall score
                 </p>
                 <p className="mt-1 text-4xl font-semibold text-slate-950">
                   {capsule.overallReadinessScore}%
                 </p>
+                <ScoreScale value={capsule.overallReadinessScore} />
               </div>
             </div>
           </div>
@@ -131,25 +153,32 @@ export default async function CapsuleDetailPage({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {AEB_TARGETS.map((target) => {
+                {WORKFLOW_TARGETS.map((target) => {
                   const check = capsule.readinessChecks.find(
                     (item) => item.target === target,
                   );
 
                   return (
-                    <tr key={target}>
+                    <tr
+                      key={target}
+                      className="scroll-mt-28 transition-colors"
+                      id={workflowRowId(target)}
+                    >
                       <td className="px-4 py-3 font-semibold text-slate-950">
                         {formatTarget(target)}
                       </td>
                       <td className="px-4 py-3">
-                        <StatusBadge status={check?.status ?? "notApplicable"} />
+                        <StatusBadge
+                          labelStyle="aviation"
+                          status={check?.status ?? "notApplicable"}
+                        />
                       </td>
                       <td className="px-4 py-3 text-slate-700">
                         {check ? `${check.score}%` : "-"}
                       </td>
                       <td className="px-4 py-3 text-slate-700">
                         {check?.summary ??
-                          "No stored readiness check yet. Use Recompute Readiness."}
+                          "No stored readiness check yet. Run a pre-flight check to populate this row."}
                       </td>
                       <td className="px-4 py-3">
                         {check && check.status !== "notApplicable" ? (
@@ -157,7 +186,7 @@ export default async function CapsuleDetailPage({
                             href={`/capsules/${capsule.id}/payloads/${target}`}
                             className="text-sm font-semibold text-teal-700 hover:text-teal-900"
                           >
-                            View payload preview
+                            View handover packet
                           </Link>
                         ) : (
                           <span className="text-sm text-slate-400">
@@ -175,7 +204,7 @@ export default async function CapsuleDetailPage({
 
         <section className="mt-6 grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
           <Section title="Blocking Issues" icon={ShieldAlert}>
-            <IssueList capsule={capsule} />
+            <CapsuleIssues capsule={capsule} />
           </Section>
 
           <Section title="Remediation Tasks" icon={RefreshCw}>
@@ -184,38 +213,19 @@ export default async function CapsuleDetailPage({
         </section>
 
         <Section title="Evidence Map" icon={FileText}>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[980px] text-left text-sm">
-              <thead className="bg-slate-50 text-xs uppercase tracking-[0.12em] text-slate-500">
-                <tr>
-                  <th className="px-4 py-3 font-semibold">Field</th>
-                  <th className="px-4 py-3 font-semibold">Value</th>
-                  <th className="px-4 py-3 font-semibold">Source document</th>
-                  <th className="px-4 py-3 font-semibold">Confidence</th>
-                  <th className="px-4 py-3 font-semibold">Source reference</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200">
-                {capsule.extractedFields.map((field) => (
-                  <tr key={field.id}>
-                    <td className="px-4 py-3 font-semibold text-slate-950">
-                      {field.label}
-                    </td>
-                    <td className="px-4 py-3 text-slate-700">{field.value}</td>
-                    <td className="px-4 py-3 text-slate-700">
-                      {field.sourceDocument?.filename ?? "Capsule context"}
-                    </td>
-                    <td className="px-4 py-3 text-slate-700">
-                      {Math.round(field.confidence * 100)}%
-                    </td>
-                    <td className="px-4 py-3 text-slate-700">
-                      {field.sourceRef}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <EvidenceMap
+            fields={capsule.extractedFields.map((field) => ({
+              id: field.id,
+              fieldKey: field.fieldKey,
+              label: field.label,
+              value: field.value,
+              confidence: field.confidence,
+              sourceRef: field.sourceRef,
+              sourceDocument: field.sourceDocument
+                ? { filename: field.sourceDocument.filename }
+                : null,
+            }))}
+          />
         </Section>
 
         <section className="mt-6 grid gap-6 xl:grid-cols-[1fr_0.9fr]">
@@ -239,7 +249,7 @@ export default async function CapsuleDetailPage({
                         {document.filename}
                       </td>
                       <td className="px-4 py-3 text-slate-700">
-                        {formatDate(document.uploadedAt)}
+                        {formatDateTime(document.uploadedAt)}
                       </td>
                     </tr>
                   ))}
@@ -249,19 +259,13 @@ export default async function CapsuleDetailPage({
           </Section>
 
           <Section title="Audit Timeline" icon={FileText}>
-            <div className="divide-y divide-slate-200">
-              {buildTimeline(capsule).map((event) => (
-                <div key={event.key} className="p-5">
-                  <p className="font-semibold text-slate-950">{event.title}</p>
-                  <p className="mt-1 text-sm leading-6 text-slate-600">
-                    {event.message}
-                  </p>
-                  <p className="mt-2 text-xs uppercase tracking-[0.12em] text-slate-500">
-                    {formatDate(event.date)}
-                  </p>
-                </div>
-              ))}
-            </div>
+            <AuditTimeline
+              auditEvents={capsule.auditEvents}
+              fallback={{
+                createdAt: capsule.createdAt,
+                customerName: capsule.customerName,
+              }}
+            />
           </Section>
         </section>
 
@@ -292,6 +296,39 @@ function Meta({ label, value }: { label: string; value: string }) {
   );
 }
 
+function ScoreScale({ value }: { value: number }) {
+  const clampedValue = clampScoreToPercent(value);
+
+  return (
+    <div aria-hidden="true" className="mt-3">
+      <div className="relative h-2 overflow-visible rounded-full bg-slate-200">
+        <div
+          className="absolute inset-y-0 left-0 rounded-l-full bg-red-300/70"
+          style={{ width: "50%" }}
+        />
+        <div
+          className="absolute inset-y-0 left-[50%] bg-amber-300/75"
+          style={{ width: "30%" }}
+        />
+        <div
+          className="absolute inset-y-0 left-[80%] rounded-r-full bg-emerald-300/75"
+          style={{ width: "20%" }}
+        />
+        <span
+          className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white bg-slate-950 shadow-sm shadow-slate-400/50"
+          style={{ left: `${clampedValue}%` }}
+        />
+      </div>
+      <div className="mt-1 flex justify-between text-[10px] font-medium text-slate-400">
+        <span>0</span>
+        <span>50</span>
+        <span>80</span>
+        <span>100</span>
+      </div>
+    </div>
+  );
+}
+
 function Section({
   title,
   icon: Icon,
@@ -314,63 +351,6 @@ function Section({
       </div>
       {children}
     </section>
-  );
-}
-
-function IssueList({
-  capsule,
-}: {
-  capsule: NonNullable<Awaited<ReturnType<typeof getCapsuleDetail>>>;
-}) {
-  const issues = [
-    ...capsule.missingEvidence.map((item) => ({
-      id: item.id,
-      type: "Missing evidence",
-      label: item.label,
-      severity: item.severity,
-      detail: `Required for ${formatTarget(item.requiredForTarget)}`,
-      action: item.suggestedAction,
-    })),
-    ...capsule.contradictions.map((item) => ({
-      id: item.id,
-      type: "Contradiction",
-      label: item.description,
-      severity: item.severity,
-      detail: `${item.leftSource}: ${item.leftValue} / ${item.rightSource}: ${item.rightValue}`,
-      action: "Reconcile the conflicting source values before handover.",
-    })),
-    ...readinessReasonIssues(capsule),
-  ].sort((a, b) => severityRank(b.severity) - severityRank(a.severity));
-
-  if (issues.length === 0) {
-    return (
-      <div className="p-5 text-sm leading-6 text-slate-600">
-        No blocking issues found. The capsule currently has no stored
-        contradictions, missing evidence or blocking readiness reasons.
-      </div>
-    );
-  }
-
-  return (
-    <div className="divide-y divide-slate-200">
-      {issues.map((issue) => (
-        <div key={issue.id} className="p-5">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
-                {issue.type}
-              </p>
-              <p className="mt-1 font-semibold text-slate-950">{issue.label}</p>
-            </div>
-            <SeverityBadge severity={issue.severity} />
-          </div>
-          <p className="mt-2 text-sm leading-6 text-slate-600">{issue.detail}</p>
-          <p className="mt-2 text-sm font-medium text-slate-800">
-            Suggested action: {issue.action}
-          </p>
-        </div>
-      ))}
-    </div>
   );
 }
 
@@ -413,7 +393,7 @@ function RemediationTaskList({
               <span>Owner: {formatStatus(task.ownerRole)}</span>
               {task.target ? <span>Target: {formatTarget(task.target)}</span> : null}
               {task.severity ? <span>Severity: {formatStatus(task.severity)}</span> : null}
-              {task.dueDate ? <span>Due: {formatDate(task.dueDate)}</span> : null}
+              {task.dueDate ? <span>Due: {formatDateTime(task.dueDate)}</span> : null}
             </div>
 
             {task.dismissedReason ? (
@@ -450,7 +430,7 @@ function RemediationTaskList({
                 >
                   <button className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 text-xs font-semibold text-emerald-800 transition hover:bg-emerald-100">
                     <CircleCheck aria-hidden="true" size={14} />
-                    Mark resolved
+                    Sign off
                   </button>
                 </form>
               ) : null}
@@ -486,175 +466,6 @@ function RemediationTaskList({
   );
 }
 
-function readinessReasonIssues(
-  capsule: NonNullable<Awaited<ReturnType<typeof getCapsuleDetail>>>,
-) {
-  const seen = new Set<string>();
-
-  return capsule.readinessChecks.flatMap((check) =>
-    getReadinessReasons(check.details)
-      .filter((reason) => reason.severity !== "info")
-      .flatMap((reason) => {
-        const key = `${check.target}:${reason.code}:${reason.severity}`;
-
-        if (seen.has(key)) {
-          return [];
-        }
-
-        seen.add(key);
-
-        return [
-          {
-            id: key,
-            type: "Readiness reason",
-            label: reason.code,
-            severity: reason.severity,
-            detail: `${formatTarget(check.target)}: ${reason.message}`,
-            action:
-              "Create or update the supporting evidence, then recompute readiness.",
-          },
-        ];
-      }),
-  );
-}
-
-function getReadinessReasons(details: unknown) {
-  if (!details || typeof details !== "object" || Array.isArray(details)) {
-    return [];
-  }
-
-  const reasons = (details as { reasons?: unknown }).reasons;
-
-  if (!Array.isArray(reasons)) {
-    return [];
-  }
-
-  return reasons.flatMap((item) => {
-    if (!item || typeof item !== "object" || Array.isArray(item)) {
-      return [];
-    }
-
-    const reason = item as Record<string, unknown>;
-    const code = typeof reason.code === "string" ? reason.code : undefined;
-    const message =
-      typeof reason.message === "string" ? reason.message : undefined;
-    const severity =
-      reason.severity === "blocking" ||
-      reason.severity === "warning" ||
-      reason.severity === "info"
-        ? reason.severity
-        : undefined;
-
-    if (!code || !message || !severity) {
-      return [];
-    }
-
-    return [{ code, message, severity }];
-  });
-}
-
-function StatusBadge({ status }: { status: CapsuleStatus | ReadinessStatus | string }) {
-  const classes: Record<string, string> = {
-    ready: "border-emerald-200 bg-emerald-50 text-emerald-800",
-    warning: "border-amber-200 bg-amber-50 text-amber-800",
-    blocked: "border-red-200 bg-red-50 text-red-800",
-    notApplicable: "border-slate-200 bg-slate-50 text-slate-700",
-    draft: "border-slate-200 bg-slate-50 text-slate-700",
-    analyzing: "border-blue-200 bg-blue-50 text-blue-800",
-    open: "border-slate-200 bg-slate-50 text-slate-800",
-    inProgress: "border-blue-200 bg-blue-50 text-blue-800",
-    resolved: "border-emerald-200 bg-emerald-50 text-emerald-800",
-    dismissed: "border-slate-200 bg-slate-50 text-slate-700",
-  };
-
-  return (
-    <span
-      className={`inline-flex w-fit rounded-md border px-2 py-1 text-xs font-semibold ${classes[status] ?? classes.notApplicable}`}
-    >
-      {formatStatus(status)}
-    </span>
-  );
-}
-
-function SeverityBadge({ severity }: { severity: string }) {
-  const classes: Record<string, string> = {
-    blocking: "border-red-200 bg-red-50 text-red-800",
-    warning: "border-amber-200 bg-amber-50 text-amber-800",
-    info: "border-slate-200 bg-slate-50 text-slate-700",
-  };
-
-  return (
-    <span
-      className={`inline-flex w-fit rounded-md border px-2 py-1 text-xs font-semibold ${classes[severity]}`}
-    >
-      {formatStatus(severity)}
-    </span>
-  );
-}
-
-function buildTimeline(
-  capsule: NonNullable<Awaited<ReturnType<typeof getCapsuleDetail>>>,
-) {
-  const latestReadinessEvent = capsule.auditEvents.find(
-    (event) => event.eventType === "readiness.computed",
-  );
-  const latestTaskEvent = capsule.auditEvents.find(
-    (event) => event.eventType === "tasks.created",
-  );
-  const latestDocsEvent = capsule.auditEvents.find(
-    (event) => event.eventType === "documents.analyzed",
-  );
-
-  return [
-    {
-      key: "created",
-      title: "Created",
-      message: `Capsule created for ${capsule.customerName}.`,
-      date: capsule.createdAt,
-    },
-    {
-      key: "documents",
-      title: "Documents analyzed",
-      message:
-        latestDocsEvent?.message ??
-        `${capsule.sourceDocuments.length} source documents attached for analysis.`,
-      date: latestDocsEvent?.createdAt ?? latestDocumentDate(capsule),
-    },
-    {
-      key: "readiness",
-      title: "Readiness computed",
-      message:
-        latestReadinessEvent?.message ??
-        `${capsule.readinessChecks.length} readiness checks are stored.`,
-      date: latestReadinessEvent?.createdAt ?? capsule.updatedAt,
-    },
-    {
-      key: "tasks",
-      title: "Tasks created",
-      message:
-        latestTaskEvent?.message ??
-        `${capsule.remediationTasks.length} remediation tasks are stored.`,
-      date: latestTaskEvent?.createdAt ?? capsule.updatedAt,
-    },
-    ...capsule.auditEvents.slice(0, 4).map((event) => ({
-      key: event.id,
-      title: formatStatus(event.eventType),
-      message: event.message,
-      date: event.createdAt,
-    })),
-  ];
-}
-
-function latestDocumentDate(
-  capsule: NonNullable<Awaited<ReturnType<typeof getCapsuleDetail>>>,
-) {
-  return capsule.sourceDocuments.reduce(
-    (latest, document) =>
-      document.uploadedAt > latest ? document.uploadedAt : latest,
-    capsule.createdAt,
-  );
-}
-
 function createPayloadPreview(
   capsule: NonNullable<Awaited<ReturnType<typeof getCapsuleDetail>>>,
   target: AebTarget,
@@ -663,50 +474,11 @@ function createPayloadPreview(
 }
 
 function parsePayloadTarget(value: string): AebTarget | undefined {
-  return AEB_TARGETS.includes(value as AebTarget)
+  return WORKFLOW_TARGETS.includes(value as AebTarget)
     ? (value as AebTarget)
     : undefined;
 }
 
 function single(value: string | string[] | undefined): string {
   return Array.isArray(value) ? value[0] ?? "" : value ?? "";
-}
-
-function severityRank(severity: string): number {
-  if (severity === "blocking") {
-    return 3;
-  }
-
-  if (severity === "warning") {
-    return 2;
-  }
-
-  return 1;
-}
-
-function formatStatus(value: string): string {
-  return value
-    .replace(/([A-Z])/g, " $1")
-    .replace(/\./g, " ")
-    .replace(/_/g, " ")
-    .trim()
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
-function formatTarget(value: string): string {
-  return value
-    .toLowerCase()
-    .split("_")
-    .map((word) => word[0].toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
-function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("en", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
 }

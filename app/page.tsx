@@ -2,6 +2,7 @@ import { ArrowRight, ClipboardCheck, FileSearch, ShieldCheck } from "lucide-reac
 import Link from "next/link";
 
 import { AppShell } from "@/components/app-shell";
+import { HeroCapsuleAnimation } from "@/components/HeroCapsuleAnimation";
 
 const workflowHighlights = [
   {
@@ -59,35 +60,7 @@ export default function Home() {
           </div>
 
           <div className="relative flex items-end px-6 pb-8 sm:px-9 lg:py-12">
-            <div className="w-full rounded-xl border border-white/10 bg-white/10 p-5 shadow-2xl shadow-black/20 backdrop-blur">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-200">
-                Mock shipment capsule
-              </p>
-              <h2 className="mt-3 text-2xl font-semibold text-white">
-                EU-DE-4288 / Industrial valves
-              </h2>
-              <dl className="mt-5 grid gap-3 text-sm">
-                <div className="flex items-center justify-between rounded-lg bg-white/10 px-3 py-2">
-                  <dt className="text-slate-300">Commercial invoice</dt>
-                  <dd className="font-semibold text-emerald-200">Matched</dd>
-                </div>
-                <div className="flex items-center justify-between rounded-lg bg-white/10 px-3 py-2">
-                  <dt className="text-slate-300">Packing list</dt>
-                  <dd className="font-semibold text-amber-200">Needs review</dd>
-                </div>
-                <div className="flex items-center justify-between rounded-lg bg-white/10 px-3 py-2">
-                  <dt className="text-slate-300">ERP export</dt>
-                  <dd className="font-semibold text-emerald-200">Parsed</dd>
-                </div>
-                <div className="flex items-center justify-between rounded-lg bg-teal-300/15 px-3 py-2">
-                  <dt className="text-slate-200">AEB-ready score</dt>
-                  <dd className="font-semibold text-white">76%</dd>
-                </div>
-              </dl>
-              <div className="mt-5 h-2 overflow-hidden rounded-full bg-white/10">
-                <div className="line-grow h-full w-[76%] rounded-full bg-gradient-to-r from-amber-300 to-teal-300" />
-              </div>
-            </div>
+            <HeroCapsuleAnimation />
           </div>
         </section>
 
