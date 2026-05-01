@@ -49,41 +49,32 @@ export default async function PitchPage() {
 
   return (
     <AppShell>
-      <main className="mx-auto grid w-full max-w-7xl gap-6 px-5 py-8 lg:grid-cols-[280px_1fr]">
-        <aside className="lg:sticky lg:top-6 lg:self-start">
-          <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">
-              Guided partner demo
-            </p>
-            <h1 className="mt-2 text-2xl font-semibold tracking-normal text-slate-950">
-              AEB Readiness Copilot
-            </h1>
-            <p className="mt-3 text-sm leading-6 text-slate-600">
-              A five-step flow for AEB-ready data preparation, designed for
-              AEB-adjacent workflows.
-            </p>
-            <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">
-              Prototype only. Not legal, customs, sanctions or export-control
-              advice. Uses mock AEB adapters for AEB-adjacent workflow previews.
+      <main className="mx-auto grid w-full max-w-7xl gap-7 px-5 py-7 lg:grid-cols-[292px_1fr]">
+        <aside className="lg:sticky lg:top-24 lg:self-start">
+          <div className="overflow-hidden rounded-xl border border-slate-200/80 bg-white/80 shadow-sm shadow-slate-200/50 backdrop-blur">
+            <div className="border-b border-slate-100 p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">
+                Guided partner demo
+              </p>
+              <h1 className="mt-2 text-2xl font-semibold tracking-normal text-slate-950">
+                AEB Readiness Copilot
+              </h1>
+              <p className="mt-3 text-sm leading-6 text-slate-600">
+                Five minutes from messy intake to AEB-ready payload preview.
+              </p>
             </div>
-            <form action={resetPitchDemoDataAction} className="mt-4">
-              <button className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-slate-950 px-3 text-sm font-semibold text-white transition hover:bg-slate-800">
-                <RefreshCw aria-hidden="true" size={16} />
-                Reset demo data
-              </button>
-            </form>
-            <nav className="mt-5 space-y-2">
+            <nav className="space-y-1 p-2">
               {flow.steps.map((step, index) => (
                 <a
                   key={step.id}
                   href={`#${step.id}`}
-                  className="grid grid-cols-[2rem_1fr] gap-3 rounded-md border border-slate-200 px-3 py-3 text-sm transition hover:border-teal-300 hover:bg-teal-50/40"
+                  className="group grid grid-cols-[2rem_1fr] gap-3 rounded-lg px-3 py-3 text-sm transition hover:bg-teal-50"
                 >
-                  <span className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-xs font-semibold text-slate-700">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-xs font-semibold text-slate-700 transition group-hover:bg-teal-700 group-hover:text-white">
                     {index + 1}
                   </span>
                   <span>
-                    <span className="block font-semibold text-slate-950">
+                    <span className="block font-semibold text-slate-950 transition group-hover:text-teal-950">
                       {step.title}
                     </span>
                     <span className="mt-1 block text-xs text-slate-500">
@@ -93,41 +84,85 @@ export default async function PitchPage() {
                 </a>
               ))}
             </nav>
+            <div className="border-t border-slate-100 p-4">
+              <div className="rounded-lg bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-950">
+                Prototype only. Uses mock AEB adapters for AEB-adjacent workflow
+                previews.
+              </div>
+              <form action={resetPitchDemoDataAction} className="mt-3">
+                <button className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-slate-950 px-3 text-sm font-semibold text-white transition hover:bg-teal-800">
+                  <RefreshCw aria-hidden="true" size={16} />
+                  Reset demo data
+                </button>
+              </form>
+            </div>
           </div>
         </aside>
 
         <div className="min-w-0">
-          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
+          <section className="surface-in overflow-hidden rounded-2xl bg-slate-950 text-white shadow-xl shadow-slate-300/40">
+            <div className="relative grid min-h-[430px] gap-8 px-6 py-8 sm:px-8 lg:grid-cols-[1fr_320px] lg:items-end lg:p-10">
+              <div className="absolute inset-0 opacity-70">
+                <div className="h-full w-full bg-[radial-gradient(circle_at_20%_20%,rgba(20,184,166,0.28),transparent_28rem),linear-gradient(135deg,#071412_0%,#10201e_48%,#172026_100%)]" />
+                <div className="absolute inset-x-10 top-24 h-px bg-gradient-to-r from-transparent via-teal-300/40 to-transparent" />
+                <div className="absolute bottom-10 right-8 grid w-72 grid-cols-6 gap-2 opacity-30">
+                  {Array.from({ length: 36 }).map((_, index) => (
+                    <span
+                      key={index}
+                      className="h-2 rounded-full bg-teal-200/70"
+                    />
+                  ))}
+                </div>
+              </div>
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-700">
+                <p className="relative text-sm font-semibold uppercase tracking-[0.18em] text-teal-200">
                   Strategic partner walkthrough
                 </p>
-                <h2 className="mt-2 max-w-3xl text-3xl font-semibold tracking-normal text-slate-950">
-                  From messy trade intake to an AEB-ready payload preview in
-                  under five minutes.
+                <h2 className="relative mt-4 max-w-4xl text-4xl font-semibold tracking-normal text-white sm:text-6xl">
+                  From messy trade intake to AEB-ready evidence.
                 </h2>
-                <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-600">
+                <p className="relative mt-5 max-w-2xl text-base leading-7 text-slate-300">
                   {flow.positioningCopy}
                 </p>
+                <div className="relative mt-7 flex flex-wrap gap-3">
+                  <a
+                    href="#messy-intake"
+                    className="inline-flex h-11 items-center gap-2 rounded-md bg-teal-400 px-4 text-sm font-semibold text-slate-950 transition hover:bg-teal-300"
+                  >
+                    Start walkthrough
+                    <ArrowRight aria-hidden="true" size={16} />
+                  </a>
+                  <Link
+                    href="/demo"
+                    className="inline-flex h-11 items-center rounded-md border border-white/20 px-4 text-sm font-semibold text-white transition hover:bg-white/10"
+                  >
+                    Open dashboard
+                  </Link>
+                </div>
               </div>
-              <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 lg:min-w-72">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+              <div className="relative rounded-xl border border-white/10 bg-white/10 p-5 backdrop-blur">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-200">
                   Demo capsule
                 </p>
-                <p className="mt-2 font-semibold text-slate-950">
+                <p className="mt-3 text-2xl font-semibold text-white">
                   {flow.primaryCapsule.capsuleNumber}
                 </p>
-                <p className="mt-1 text-sm leading-6 text-slate-600">
+                <p className="mt-2 text-sm leading-6 text-slate-300">
                   {flow.primaryCapsule.title}
                 </p>
-                <dl className="mt-4 grid gap-2 text-sm">
-                  <Meta label="Customer" value={flow.primaryCapsule.customerName} />
-                  <Meta
-                    label="Destination"
-                    value={flow.primaryCapsule.destinationCountry}
-                  />
-                  <Meta label="Incoterm" value={flow.primaryCapsule.incoterm} />
+                <dl className="mt-5 grid gap-3 text-sm">
+                  {[
+                    ["Customer", flow.primaryCapsule.customerName],
+                    ["Destination", flow.primaryCapsule.destinationCountry],
+                    ["Incoterm", flow.primaryCapsule.incoterm],
+                  ].map(([label, value]) => (
+                    <div key={label}>
+                      <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+                        {label}
+                      </dt>
+                      <dd className="mt-1 font-semibold text-white">{value}</dd>
+                    </div>
+                  ))}
                 </dl>
               </div>
             </div>
@@ -144,7 +179,7 @@ export default async function PitchPage() {
               {flow.sourceDocuments.map((document) => (
                 <div
                   key={document.type}
-                  className="rounded-lg border border-slate-200 bg-slate-50 p-4"
+                  className="group border-l border-slate-200 bg-white py-4 pl-4 transition hover:border-teal-400"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
@@ -155,7 +190,7 @@ export default async function PitchPage() {
                         {document.filename}
                       </p>
                     </div>
-                    <span className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700">
+                    <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700 transition group-hover:bg-teal-50 group-hover:text-teal-800">
                       {document.format}
                     </span>
                   </div>
@@ -165,7 +200,7 @@ export default async function PitchPage() {
                 </div>
               ))}
             </div>
-            <p className="mt-4 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">
+            <p className="mt-5 max-w-3xl border-l-2 border-teal-600 bg-teal-50/60 px-4 py-3 text-sm leading-6 text-slate-700">
               Talk track: The value is not replacing AEB. The value is getting
               inconsistent intake into a reliable, traceable shape before an
               AEB-adjacent workflow needs it.
@@ -315,12 +350,12 @@ export default async function PitchPage() {
             icon={Braces}
             summary="The last step shows an AEB-compatible payload preview produced by a mock AEB adapter. It is not a filing and does not connect to external AEB APIs."
           >
-            <div className="grid gap-4 lg:grid-cols-[0.75fr_1.25fr]">
-              <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <div className="grid gap-5 lg:grid-cols-[0.75fr_1.25fr]">
+              <div className="rounded-xl bg-slate-950 p-5 text-white">
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
                   Mock adapter
                 </p>
-                <h3 className="mt-2 text-lg font-semibold text-slate-950">
+                <h3 className="mt-2 text-xl font-semibold text-white">
                   {formatTarget(flow.payloadPreview.target)}
                 </h3>
                 <dl className="mt-4 grid gap-3 text-sm">
@@ -337,13 +372,13 @@ export default async function PitchPage() {
                     value={`${flow.payloadPreview.sourceFieldRefs.length} fields`}
                   />
                 </dl>
-                <p className="mt-4 text-sm leading-6 text-slate-600">
+                <p className="mt-4 text-sm leading-6 text-slate-300">
                   This demonstrates AEB-ready data preparation only. The mock
                   AEB adapter builds a preview of what an AEB-adjacent handover
                   could consume after validation.
                 </p>
               </div>
-              <pre className="max-h-[560px] overflow-auto rounded-lg bg-slate-950 p-5 text-xs leading-6 text-slate-100">
+              <pre className="max-h-[560px] overflow-auto rounded-xl bg-[#071412] p-5 text-xs leading-6 text-teal-50 shadow-inner">
                 {JSON.stringify(visiblePayload, null, 2)}
               </pre>
             </div>
@@ -372,17 +407,17 @@ function PitchSection({
   return (
     <section
       id={id}
-      className="mt-6 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm"
+      className="surface-in mt-7 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm shadow-slate-200/50 backdrop-blur"
     >
-      <div className="flex flex-col gap-3 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col gap-3 border-b border-slate-100 px-5 py-5 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-md bg-teal-50 text-sm font-semibold text-teal-800">
+          <span className="flex h-10 w-10 items-center justify-center rounded-md bg-slate-950 text-sm font-semibold text-white">
             {step}
           </span>
           <div>
             <div className="flex items-center gap-2">
-              <Icon aria-hidden="true" className="text-slate-500" size={18} />
-              <h2 className="text-base font-semibold text-slate-950">{title}</h2>
+              <Icon aria-hidden="true" className="text-teal-700" size={18} />
+              <h2 className="text-lg font-semibold text-slate-950">{title}</h2>
             </div>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
               {summary}
@@ -390,7 +425,7 @@ function PitchSection({
           </div>
         </div>
       </div>
-      <div className="p-5">{children}</div>
+      <div className="p-5 sm:p-6">{children}</div>
     </section>
   );
 }
@@ -410,9 +445,9 @@ function ExceptionPanel({
   }>;
 }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-slate-50">
-      <div className="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
-        <Icon aria-hidden="true" className="text-slate-500" size={16} />
+    <div className="rounded-xl border border-slate-200 bg-white">
+      <div className="flex items-center gap-2 border-b border-slate-100 px-4 py-3">
+        <Icon aria-hidden="true" className="text-teal-700" size={16} />
         <h3 className="text-sm font-semibold text-slate-950">{title}</h3>
       </div>
       <div className="divide-y divide-slate-200">
@@ -441,10 +476,10 @@ function ExceptionPanel({
 function Meta({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+      <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
         {label}
       </dt>
-      <dd className="mt-1 font-semibold text-slate-950">{value}</dd>
+      <dd className="mt-1 font-semibold text-white">{value}</dd>
     </div>
   );
 }

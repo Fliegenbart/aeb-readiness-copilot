@@ -84,37 +84,48 @@ export default async function DemoPage({ searchParams }: DemoPageProps) {
 
   return (
     <AppShell>
-      <main className="mx-auto w-full max-w-7xl px-5 py-8">
-        <section className="flex flex-col gap-4 border-b border-slate-200 pb-6 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <h1 className="text-3xl font-semibold tracking-normal text-slate-950">
-              Demo dashboard
-            </h1>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-              Evidence Capsules, AEB-ready status and operational blockers from
-              the seeded SQLite demo database.
-            </p>
+      <main className="mx-auto w-full max-w-7xl px-5 py-7">
+        <section className="surface-in overflow-hidden rounded-2xl bg-slate-950 text-white shadow-xl shadow-slate-300/40">
+          <div className="relative px-6 py-7 sm:px-8">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_0%,rgba(20,184,166,0.22),transparent_24rem),linear-gradient(135deg,#071412,#14201f)]" />
+            <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-200">
+                  Readiness operations
+                </p>
+                <h1 className="mt-3 text-3xl font-semibold tracking-normal text-white sm:text-4xl">
+                  Demo dashboard
+                </h1>
+                <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+                  Evidence Capsules, AEB-ready status and operational blockers
+                  from the seeded SQLite demo database.
+                </p>
+              </div>
+              <p className="max-w-sm rounded-lg border border-amber-200/30 bg-amber-100/10 px-3 py-2 text-xs font-medium leading-5 text-amber-100">
+                Prototype only. Not legal, customs, sanctions or export-control
+                advice.
+              </p>
+            </div>
           </div>
-          <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-900">
-            Prototype only. Not legal, customs, sanctions or export-control
-            advice.
-          </p>
         </section>
 
-        <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        <section className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {cards.map((card) => (
             <DashboardCard key={card.title} {...card} />
           ))}
         </section>
 
-        <section className="mt-6 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-          <form className="grid gap-3 lg:grid-cols-[1fr_1fr_1fr_auto_auto]" action="/demo">
+        <section className="mt-5 rounded-xl border border-slate-200/80 bg-white/80 p-4 shadow-sm shadow-slate-200/40 backdrop-blur">
+          <form
+            className="grid gap-3 lg:grid-cols-[1fr_1fr_1fr_auto_auto]"
+            action="/demo"
+          >
             <label className="grid gap-1 text-sm font-medium text-slate-700">
               Status
               <select
                 name="status"
                 defaultValue={filters.status ?? ""}
-                className="h-10 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none transition focus:border-teal-700"
+                className="h-10 rounded-md border border-slate-200 bg-slate-50 px-3 text-sm text-slate-950 outline-none transition focus:border-teal-700 focus:bg-white"
               >
                 <option value="">All statuses</option>
                 {statusOptions.map((status) => (
@@ -130,7 +141,7 @@ export default async function DemoPage({ searchParams }: DemoPageProps) {
               <select
                 name="target"
                 defaultValue={filters.target ?? ""}
-                className="h-10 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none transition focus:border-teal-700"
+                className="h-10 rounded-md border border-slate-200 bg-slate-50 px-3 text-sm text-slate-950 outline-none transition focus:border-teal-700 focus:bg-white"
               >
                 <option value="">All target workflows</option>
                 {targetOptions.map((target) => (
@@ -146,7 +157,7 @@ export default async function DemoPage({ searchParams }: DemoPageProps) {
               <select
                 name="destinationCountry"
                 defaultValue={filters.destinationCountry ?? ""}
-                className="h-10 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-950 outline-none transition focus:border-teal-700"
+                className="h-10 rounded-md border border-slate-200 bg-slate-50 px-3 text-sm text-slate-950 outline-none transition focus:border-teal-700 focus:bg-white"
               >
                 <option value="">All destinations</option>
                 {data.destinationCountries.map((country) => (
@@ -157,24 +168,24 @@ export default async function DemoPage({ searchParams }: DemoPageProps) {
               </select>
             </label>
 
-            <button className="mt-6 inline-flex h-10 items-center justify-center gap-2 rounded-md bg-slate-950 px-4 text-sm font-semibold text-white transition hover:bg-slate-800 lg:mt-auto">
+            <button className="mt-6 inline-flex h-10 items-center justify-center gap-2 rounded-md bg-slate-950 px-4 text-sm font-semibold text-white transition hover:bg-teal-800 lg:mt-auto">
               <Filter aria-hidden="true" size={16} />
               Apply
             </button>
 
             <Link
               href="/demo"
-              className="mt-6 inline-flex h-10 items-center justify-center rounded-md border border-slate-300 px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 lg:mt-auto"
+              className="mt-6 inline-flex h-10 items-center justify-center rounded-md border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 lg:mt-auto"
             >
               Reset
             </Link>
           </form>
         </section>
 
-        <section className="mt-6 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-          <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+        <section className="mt-5 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm shadow-slate-200/40">
+          <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
             <div>
-              <h2 className="text-base font-semibold text-slate-950">
+              <h2 className="text-lg font-semibold text-slate-950">
                 Evidence Capsules
               </h2>
               <p className="mt-1 text-xs text-slate-500">
@@ -204,11 +215,11 @@ export default async function DemoPage({ searchParams }: DemoPageProps) {
                 </thead>
                 <tbody className="divide-y divide-slate-200">
                   {data.capsules.map((capsule) => (
-                    <tr key={capsule.id} className="transition hover:bg-slate-50">
+                    <tr key={capsule.id} className="transition hover:bg-teal-50/35">
                       <td className="px-4 py-3">
                         <Link
                           href={`/capsules/${capsule.id}`}
-                          className="font-semibold text-slate-950 underline-offset-4 hover:underline"
+                          className="font-semibold text-slate-950 underline-offset-4 hover:text-teal-800 hover:underline"
                         >
                           {capsule.capsuleNumber}
                         </Link>
