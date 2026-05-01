@@ -33,7 +33,7 @@ export default function Home() {
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-700">
               Turn messy trade documents and ERP extracts into structured
               Evidence Capsules, readiness scores and remediation tasks before
-              data goes to AEB or an AEB-connected process.
+              handoff into an AEB-adjacent workflow.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link

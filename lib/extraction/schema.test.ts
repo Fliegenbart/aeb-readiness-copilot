@@ -43,4 +43,24 @@ describe("extraction schema validation", () => {
     expect(field.isAcceptedEvidence).toBe(false);
     expect(field.safetyNotes).toContain("Low confidence: human review required.");
   });
+
+  it("rejects legal or customs conclusion fields from AI-like output", () => {
+    expect(() =>
+      normalizeAndValidateExtractedFieldDrafts([
+        {
+          fieldName: "customsConclusion",
+          value: "Ready to file",
+          confidence: 0.95,
+          provider: "mock-ai",
+          documentType: "commercial-invoice",
+          sourceReference: {
+            label: "AI output",
+            excerpt: "Ready to file",
+          },
+          needsReview: false,
+          isAcceptedEvidence: true,
+        },
+      ]),
+    ).toThrow(/legal or customs conclusions/);
+  });
 });

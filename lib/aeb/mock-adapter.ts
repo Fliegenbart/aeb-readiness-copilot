@@ -1,41 +1,17 @@
-import type { EvidenceCapsule } from "@/lib/domain/types";
+import type { AebTarget, EvidenceCapsuleWithRelations } from "@/lib/domain/types";
+import {
+  buildAebPayloadPreview,
+  getAebAdapter,
+} from "@/lib/aeb/adapters";
+import type { AebPayloadPreview } from "@/lib/aeb/types";
 
-export type MockAebPayloadPreview = {
-  adapter: "mock-aeb-adapter";
-  payloadType: "AEB-compatible payload preview";
-  shipmentReference: string;
-  readinessCheck: {
-    score: number;
-    status: string;
-    missingEvidence: string[];
-    contradictions: string[];
-  };
-  tradeData: {
-    shipper: string;
-    consignee: string;
-    invoiceValue: number;
-    grossWeightKg: number;
-  };
-};
+export type MockAebPayloadPreview = AebPayloadPreview;
 
 export function createMockAebPayloadPreview(
-  capsule: EvidenceCapsule,
+  capsule: EvidenceCapsuleWithRelations,
+  target: AebTarget = "CUSTOMS_BROKER_INTEGRATION",
 ): MockAebPayloadPreview {
-  return {
-    adapter: "mock-aeb-adapter",
-    payloadType: "AEB-compatible payload preview",
-    shipmentReference: capsule.reference,
-    readinessCheck: {
-      score: capsule.readinessScore,
-      status: capsule.status,
-      missingEvidence: capsule.missingEvidence,
-      contradictions: capsule.contradictions,
-    },
-    tradeData: {
-      shipper: capsule.shipper,
-      consignee: capsule.consignee,
-      invoiceValue: capsule.invoiceValue,
-      grossWeightKg: capsule.packingGrossWeightKg,
-    },
-  };
+  return buildAebPayloadPreview(capsule, target);
 }
+
+export { getAebAdapter };

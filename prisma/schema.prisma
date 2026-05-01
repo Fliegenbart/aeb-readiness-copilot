@@ -8,17 +8,204 @@ datasource db {
 }
 
 model EvidenceCapsule {
-  id                   String   @id @default(cuid())
-  reference            String   @unique
-  shipper              String
-  consignee            String
-  readinessScore       Int
-  status               String
-  missingEvidenceJson  String
-  contradictionsJson   String
-  invoiceValue         Float
-  packingGrossWeightKg Float
-  erpGrossWeightKg     Float
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  id                    String             @id @default(cuid())
+  capsuleNumber         String             @unique @default(cuid())
+  objectType            EvidenceObjectType @default(shipment)
+  title                 String             @default("Untitled Evidence Capsule")
+  customerName          String             @default("Unknown customer")
+  destinationCountry    String             @default("Unknown")
+  incoterm              String             @default("Unknown")
+  status                CapsuleStatus      @default(draft)
+  overallReadinessScore Int                @default(0)
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+
+  auditEvents      AuditEvent[]
+  contradictions   Contradiction[]
+  extractedFields  ExtractedField[]
+  missingEvidence  MissingEvidence[]
+  readinessChecks  ReadinessCheck[]
+  remediationTasks RemediationTask[]
+  sourceDocuments  SourceDocument[]
+}
+
+model SourceDocument {
+  id         String             @id @default(cuid())
+  capsuleId  String
+  type       SourceDocumentType
+  filename   String
+  mimeType   String
+  mockPath   String
+  uploadedAt DateTime           @default(now())
+
+  capsule         EvidenceCapsule  @relation(fields: [capsuleId], references: [id], onDelete: Cascade)
+  extractedFields ExtractedField[]
+
+  @@index([capsuleId])
+}
+
+model ExtractedField {
+  id               String   @id @default(cuid())
+  capsuleId        String
+  sourceDocumentId String?
+  fieldKey         String
+  label            String
+  value            String
+  normalizedValue  String?
+  confidence       Float
+  sourceRef        String
+  createdAt        DateTime @default(now())
+
+  capsule        EvidenceCapsule @relation(fields: [capsuleId], references: [id], onDelete: Cascade)
+  sourceDocument SourceDocument? @relation(fields: [sourceDocumentId], references: [id], onDelete: SetNull)
+
+  @@index([capsuleId])
+  @@index([sourceDocumentId])
+}
+
+model Contradiction {
+  id          String              @id @default(cuid())
+  capsuleId   String
+  fieldKey    String
+  severity    EvidenceGapSeverity
+  description String
+  leftSource  String
+  leftValue   String
+  rightSource String
+  rightValue  String
+
+  capsule EvidenceCapsule @relation(fields: [capsuleId], references: [id], onDelete: Cascade)
+
+  @@index([capsuleId])
+}
+
+model MissingEvidence {
+  id                String              @id @default(cuid())
+  capsuleId         String
+  evidenceKey       String
+  label             String
+  severity          EvidenceGapSeverity
+  requiredForTarget AebTarget
+  suggestedAction   String
+
+  capsule EvidenceCapsule @relation(fields: [capsuleId], references: [id], onDelete: Cascade)
+
+  @@index([capsuleId])
+}
+
+model ReadinessCheck {
+  id        String          @id @default(cuid())
+  capsuleId String
+  target    AebTarget
+  status    ReadinessStatus
+  score     Int
+  summary   String
+  details   Json
+
+  capsule EvidenceCapsule @relation(fields: [capsuleId], references: [id], onDelete: Cascade)
+
+  @@index([capsuleId])
+}
+
+model RemediationTask {
+  id              String                @id @default(cuid())
+  capsuleId       String
+  title           String
+  description     String
+  ownerRole       OwnerRole
+  status          RemediationTaskStatus
+  reasonCode      String?
+  target          AebTarget?
+  severity        EvidenceGapSeverity?
+  dismissedReason String?
+  dueDate         DateTime?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  capsule EvidenceCapsule @relation(fields: [capsuleId], references: [id], onDelete: Cascade)
+
+  @@index([capsuleId])
+  @@index([capsuleId, reasonCode])
+}
+
+model AuditEvent {
+  id        String   @id @default(cuid())
+  capsuleId String
+  eventType String
+  message   String
+  actor     String
+  metadata  Json
+  createdAt DateTime @default(now())
+
+  capsule EvidenceCapsule @relation(fields: [capsuleId], references: [id], onDelete: Cascade)
+
+  @@index([capsuleId])
+}
+
+enum EvidenceObjectType {
+  shipment
+  material
+  customerOrder
+  brokerQuestion
+}
+
+enum CapsuleStatus {
+  draft
+  analyzing
+  blocked
+  warning
+  ready
+}
+
+enum SourceDocumentType {
+  commercialInvoice
+  packingList
+  erpExport
+  technicalDatasheet
+  endUseStatement
+  supplierEvidence
+  brokerEmail
+  other
+}
+
+enum EvidenceGapSeverity {
+  info
+  warning
+  blocking
+}
+
+enum ReadinessStatus {
+  ready
+  warning
+  blocked
+  notApplicable
+}
+
+enum OwnerRole {
+  logistics
+  tradeCompliance
+  sales
+  engineering
+  purchasing
+  broker
+  customer
+  supplier
+}
+
+enum RemediationTaskStatus {
+  open
+  inProgress
+  resolved
+  dismissed
+}
+
+enum AebTarget {
+  CUSTOMS_BROKER_INTEGRATION
+  CUSTOMS_MANAGEMENT
+  PRODUCT_CLASSIFICATION
+  EXPORT_CONTROLS
+  COMPLIANCE_SCREENING
+  LICENSE_MANAGEMENT
+  RISK_ASSESSMENT
+  CARRIER_CONNECT
 }

@@ -5,7 +5,7 @@ const nonGoals = [
   "No sanctions screening engine.",
   "No tariff classification engine.",
   "No export-control decision engine.",
-  "No claim of official AEB integration.",
+  "Uses mock AEB adapters only for AEB-adjacent workflow previews.",
 ];
 
 export default function ProductBriefPage() {

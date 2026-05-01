@@ -7,12 +7,14 @@
     "dev": "next dev",
     "build": "next build",
     "test": "vitest run",
-    "db:push": "prisma db push",
-    "db:seed": "prisma db seed",
-    "demo:reset": "prisma db push --force-reset && prisma db seed"
+    "db:push": "DATABASE_URL=file:./dev.db RUST_LOG=info prisma db push --skip-generate && DATABASE_URL=file:./dev.db prisma generate",
+    "db:seed": "DATABASE_URL=file:./dev.db prisma db seed",
+    "demo:reset": "node -e \"require('fs').rmSync('storage/uploads',{recursive:true,force:true})\" && DATABASE_URL=file:./dev.db RUST_LOG=info prisma db push --force-reset --skip-generate && DATABASE_URL=file:./dev.db prisma generate && DATABASE_URL=file:./dev.db prisma db seed"
   },
   "dependencies": {
     "@prisma/client": "6.19.3",
+    "dotenv": "16.6.1",
+    "fflate": "0.8.2",
     "lucide-react": "1.14.0",
     "next": "16.2.4",
     "react": "19.2.5",
@@ -27,7 +29,7 @@
     "@vitejs/plugin-react": "6.0.1",
     "eslint": "9.39.2",
     "eslint-config-next": "16.2.4",
-    "postcss": "8.5.6",
+    "postcss": "8.5.12",
     "prisma": "6.19.3",
     "tailwindcss": "4.2.4",
     "tsx": "4.21.0",
@@ -35,7 +37,7 @@
     "vite": "8.0.10",
     "vitest": "4.1.5"
   },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
+  "overrides": {
+    "postcss": "8.5.12"
   }
 }

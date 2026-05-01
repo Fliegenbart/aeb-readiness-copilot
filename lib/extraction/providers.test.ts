@@ -18,6 +18,25 @@ describe("extraction provider configuration", () => {
     expect(resolution.activeProvider).toBe("deterministic");
     expect(resolution.disabledReason).toMatch(/OPENAI_API_KEY/);
   });
+
+  it("enables the OpenAI skeleton only when a key is present", () => {
+    const resolution = getExtractionProvider({
+      EXTRACTION_PROVIDER: "openai",
+      OPENAI_API_KEY: "test-key",
+    });
+
+    const fields = resolution.provider.extract("Invoice Number: INV-42", "commercial-invoice", {
+      shipmentReference: "CAP-TEST",
+    });
+
+    expect(resolution.activeProvider).toBe("openai");
+    expect(fields).toHaveLength(1);
+    expect(fields[0]).toMatchObject({
+      provider: "openai",
+      needsReview: true,
+      isAcceptedEvidence: false,
+    });
+  });
 });
 
 describe("MockAIProvider", () => {

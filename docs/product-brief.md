@@ -46,7 +46,7 @@ legal or customs conclusions.
 - This is not a sanctions screening engine.
 - This is not a tariff classification engine.
 - This is not an export-control decision engine.
-- This does not claim official AEB integration.
+- The MVP uses mock AEB adapters only for AEB-adjacent workflow previews.
 
 The correct wording for the MVP is AEB-ready, AEB-compatible payload preview,
 mock AEB adapter and readiness check.

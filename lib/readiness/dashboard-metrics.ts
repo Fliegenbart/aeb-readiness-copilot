@@ -1,4 +1,4 @@
-import type { EvidenceCapsule } from "@/lib/domain/types";
+import type { EvidenceCapsuleWithRelations } from "@/lib/domain/types";
 
 export type DashboardMetrics = {
   totalEvidenceCapsules: number;
@@ -8,15 +8,22 @@ export type DashboardMetrics = {
 };
 
 export function calculateDashboardMetrics(
-  capsules: EvidenceCapsule[],
+  capsules: EvidenceCapsuleWithRelations[],
 ): DashboardMetrics {
   return {
     totalEvidenceCapsules: capsules.length,
-    readyForBrokerHandover: capsules.filter(
-      (capsule) => capsule.status === "AEB_READY",
+    readyForBrokerHandover: capsules.filter((capsule) =>
+      capsule.readinessChecks.some(
+        (check) =>
+          check.target === "CUSTOMS_BROKER_INTEGRATION" &&
+          check.status === "ready",
+      ),
     ).length,
     blockedByMissingEvidence: capsules.filter(
-      (capsule) => capsule.missingEvidence.length > 0,
+      (capsule) =>
+        capsule.missingEvidence.some(
+          (missingEvidence) => missingEvidence.severity === "blocking",
+        ),
     ).length,
     dataContradictions: capsules.reduce(
       (count, capsule) => count + capsule.contradictions.length,
