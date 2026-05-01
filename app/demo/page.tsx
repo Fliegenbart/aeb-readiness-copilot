@@ -107,10 +107,6 @@ export default async function DemoPage({ searchParams }: DemoPageProps) {
                   from the seeded SQLite demo database.
                 </p>
               </div>
-              <p className="max-w-sm rounded-lg border border-amber-200/30 bg-amber-100/10 px-3 py-2 text-xs font-medium leading-5 text-amber-100">
-                Prototype only. Not legal, customs, sanctions or export-control
-                advice.
-              </p>
             </div>
           </div>
         </section>
@@ -306,11 +302,16 @@ function Score({ value }: { value: number }) {
 }
 
 function StatusBadge({ status }: { status: CapsuleStatus | ReadinessStatus }) {
+  if (status === "notApplicable") {
+    return (
+      <span className="text-xs font-medium lowercase text-slate-500">n/a</span>
+    );
+  }
+
   const classes: Record<string, string> = {
     ready: "border-emerald-200 bg-emerald-50 text-emerald-800",
     warning: "border-amber-200 bg-amber-50 text-amber-800",
     blocked: "border-red-200 bg-red-50 text-red-800",
-    notApplicable: "border-slate-200 bg-slate-50 text-slate-700",
     draft: "border-slate-200 bg-slate-50 text-slate-700",
     analyzing: "border-blue-200 bg-blue-50 text-blue-800",
   };

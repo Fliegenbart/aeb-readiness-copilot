@@ -83,7 +83,7 @@ export default async function CapsuleDetailPage({
             <form action={recomputeCapsuleReadinessAction.bind(null, capsule.id)}>
               <button className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-slate-950 px-4 text-sm font-semibold text-white transition hover:bg-slate-800">
                 <RefreshCw aria-hidden="true" size={16} />
-                Recompute Readiness
+                Run readiness check
               </button>
             </form>
           </div>
@@ -136,8 +136,14 @@ export default async function CapsuleDetailPage({
                     (item) => item.target === target,
                   );
 
+                  const isNotApplicable =
+                    !check || check.status === "notApplicable";
+
                   return (
-                    <tr key={target}>
+                    <tr
+                      key={target}
+                      className={isNotApplicable ? "opacity-60" : undefined}
+                    >
                       <td className="px-4 py-3 font-semibold text-slate-950">
                         {formatTarget(target)}
                       </td>
@@ -145,11 +151,11 @@ export default async function CapsuleDetailPage({
                         <StatusBadge status={check?.status ?? "notApplicable"} />
                       </td>
                       <td className="px-4 py-3 text-slate-700">
-                        {check ? `${check.score}%` : "-"}
+                        {isNotApplicable ? "—" : `${check.score}%`}
                       </td>
                       <td className="px-4 py-3 text-slate-700">
                         {check?.summary ??
-                          "No stored readiness check yet. Use Recompute Readiness."}
+                          "Run a readiness check to populate this row."}
                       </td>
                       <td className="px-4 py-3">
                         {check && check.status !== "notApplicable" ? (
@@ -161,7 +167,7 @@ export default async function CapsuleDetailPage({
                           </Link>
                         ) : (
                           <span className="text-sm text-slate-400">
-                            Not applicable
+                            n/a
                           </span>
                         )}
                       </td>
@@ -401,7 +407,7 @@ function RemediationTaskList({
                 <p className="font-semibold text-slate-950">{task.title}</p>
                 <p className="mt-1 text-sm leading-6 text-slate-600">
                   <span className="font-medium text-slate-800">
-                    Suggested next step:
+                    Next action:
                   </span>{" "}
                   {task.description}
                 </p>
@@ -554,11 +560,16 @@ function getReadinessReasons(details: unknown) {
 }
 
 function StatusBadge({ status }: { status: CapsuleStatus | ReadinessStatus | string }) {
+  if (status === "notApplicable") {
+    return (
+      <span className="text-xs font-medium lowercase text-slate-500">n/a</span>
+    );
+  }
+
   const classes: Record<string, string> = {
     ready: "border-emerald-200 bg-emerald-50 text-emerald-800",
     warning: "border-amber-200 bg-amber-50 text-amber-800",
     blocked: "border-red-200 bg-red-50 text-red-800",
-    notApplicable: "border-slate-200 bg-slate-50 text-slate-700",
     draft: "border-slate-200 bg-slate-50 text-slate-700",
     analyzing: "border-blue-200 bg-blue-50 text-blue-800",
     open: "border-slate-200 bg-slate-50 text-slate-800",
@@ -569,7 +580,7 @@ function StatusBadge({ status }: { status: CapsuleStatus | ReadinessStatus | str
 
   return (
     <span
-      className={`inline-flex w-fit rounded-md border px-2 py-1 text-xs font-semibold ${classes[status] ?? classes.notApplicable}`}
+      className={`inline-flex w-fit rounded-md border px-2 py-1 text-xs font-semibold ${classes[status] ?? classes.draft}`}
     >
       {formatStatus(status)}
     </span>
