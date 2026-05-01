@@ -50,7 +50,7 @@ export default async function PitchPage() {
   return (
     <AppShell>
       <main className="mx-auto grid w-full max-w-7xl gap-7 px-5 py-7 lg:grid-cols-[292px_1fr]">
-        <aside className="lg:sticky lg:top-24 lg:self-start">
+        <aside className="order-2 lg:sticky lg:top-24 lg:order-1 lg:self-start">
           <div className="overflow-hidden rounded-xl border border-slate-200/80 bg-white/80 shadow-sm shadow-slate-200/50 backdrop-blur">
             <div className="border-b border-slate-100 p-5">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">
@@ -99,20 +99,22 @@ export default async function PitchPage() {
           </div>
         </aside>
 
-        <div className="min-w-0">
-          <section className="surface-in overflow-hidden rounded-2xl bg-slate-950 text-white shadow-xl shadow-slate-300/40">
+        <div className="order-1 min-w-0 lg:order-2">
+          <section className="surface-in signal-sweep overflow-hidden rounded-2xl bg-slate-950 text-white shadow-xl shadow-slate-300/40">
             <div className="relative grid min-h-[430px] gap-8 px-6 py-8 sm:px-8 lg:grid-cols-[1fr_320px] lg:items-end lg:p-10">
               <div className="absolute inset-0 opacity-70">
-                <div className="h-full w-full bg-[radial-gradient(circle_at_20%_20%,rgba(20,184,166,0.28),transparent_28rem),linear-gradient(135deg,#071412_0%,#10201e_48%,#172026_100%)]" />
-                <div className="absolute inset-x-10 top-24 h-px bg-gradient-to-r from-transparent via-teal-300/40 to-transparent" />
-                <div className="absolute bottom-10 right-8 grid w-72 grid-cols-6 gap-2 opacity-30">
+                <div className="h-full w-full data-plane" />
+                <div className="absolute inset-x-10 top-24 h-px bg-gradient-to-r from-transparent via-teal-300/50 to-transparent" />
+                <div className="absolute bottom-10 right-8 grid w-72 grid-cols-6 gap-2 opacity-35">
                   {Array.from({ length: 36 }).map((_, index) => (
                     <span
                       key={index}
-                      className="h-2 rounded-full bg-teal-200/70"
+                      className="quiet-pulse h-1 rounded-full bg-teal-200/70"
+                      style={{ animationDelay: `${index * 55}ms` }}
                     />
                   ))}
                 </div>
+                <div className="absolute bottom-0 left-0 h-1 w-3/4 bg-gradient-to-r from-teal-300 via-amber-200 to-transparent opacity-80" />
               </div>
               <div>
                 <p className="relative text-sm font-semibold uppercase tracking-[0.18em] text-teal-200">

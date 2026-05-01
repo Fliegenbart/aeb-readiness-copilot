@@ -55,39 +55,45 @@ export default async function DemoPage({ searchParams }: DemoPageProps) {
       value: data.kpis.evidenceCapsules,
       detail: "Seeded readiness records",
       icon: Database,
+      tone: "indigo" as const,
     },
     {
       title: "Ready for AEB Handover",
       value: data.kpis.readyForAebHandover,
       detail: "Broker handover checks are ready",
       icon: CheckCircle2,
+      tone: "emerald" as const,
     },
     {
       title: "Blocked Capsules",
       value: data.kpis.blockedCapsules,
       detail: "Blocking evidence or data issues",
       icon: FileWarning,
+      tone: "rose" as const,
     },
     {
       title: "Open Remediation Tasks",
       value: data.kpis.openRemediationTasks,
       detail: "Open or in-progress follow-ups",
       icon: ListChecks,
+      tone: "amber" as const,
     },
     {
       title: "Contradictions Found",
       value: data.kpis.contradictionsFound,
       detail: "Conflicting source evidence",
       icon: AlertTriangle,
+      tone: "teal" as const,
     },
   ];
 
   return (
     <AppShell>
       <main className="mx-auto w-full max-w-7xl px-5 py-7">
-        <section className="surface-in overflow-hidden rounded-2xl bg-slate-950 text-white shadow-xl shadow-slate-300/40">
+        <section className="surface-in signal-sweep overflow-hidden rounded-2xl bg-slate-950 text-white shadow-xl shadow-slate-300/40">
           <div className="relative px-6 py-7 sm:px-8">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_0%,rgba(20,184,166,0.22),transparent_24rem),linear-gradient(135deg,#071412,#14201f)]" />
+            <div className="absolute inset-0 data-plane opacity-95" />
+            <div className="absolute bottom-0 left-0 h-1 w-2/3 bg-gradient-to-r from-teal-300 via-amber-200 to-transparent opacity-80" />
             <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-200">

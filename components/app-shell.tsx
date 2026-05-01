@@ -1,9 +1,19 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export const GLOBAL_DEMO_DISCLAIMER =
   "Prototype only. Not legal, customs, sanctions or export-control advice.";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const navItems = [
+    { href: "/", label: "Home", active: pathname === "/" },
+    { href: "/demo", label: "Demo", active: pathname.startsWith("/demo") },
+    { href: "/pitch", label: "Pitch", active: pathname.startsWith("/pitch") },
+  ];
+
   return (
     <div className="min-h-screen bg-[var(--background)]">
       <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-[rgba(251,250,247,0.86)] backdrop-blur-xl">
@@ -18,24 +28,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <span>AEB Readiness Copilot</span>
           </Link>
           <div className="flex items-center rounded-full border border-slate-200 bg-white/70 p-1 shadow-sm">
-            <Link
-              href="/"
-              className="rounded-full px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
-            >
-              Home
-            </Link>
-            <Link
-              href="/demo"
-              className="rounded-full bg-slate-950 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-teal-800"
-            >
-              Demo
-            </Link>
-            <Link
-              href="/pitch"
-              className="rounded-full px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
-            >
-              Pitch
-            </Link>
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`rounded-full px-3 py-1.5 text-sm transition ${
+                  item.active
+                    ? "bg-slate-950 font-semibold text-white shadow-sm"
+                    : "font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
           </div>
         </nav>
         <div className="border-t border-amber-200/70 bg-amber-50/70">
