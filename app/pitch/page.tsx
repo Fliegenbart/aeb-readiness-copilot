@@ -86,8 +86,7 @@ export default async function PitchPage() {
             </nav>
             <div className="border-t border-slate-100 p-4">
               <div className="rounded-lg bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-950">
-                Prototype only. Uses mock AEB adapters for AEB-adjacent workflow
-                previews.
+                Uses mock AEB adapters for AEB-adjacent workflow previews.
               </div>
               <form action={resetPitchDemoDataAction} className="mt-3">
                 <button className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-slate-950 px-3 text-sm font-semibold text-white transition hover:bg-teal-800">
@@ -269,21 +268,30 @@ export default async function PitchPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
-                  {flow.readinessRows.map((row) => (
-                    <tr key={row.target}>
-                      <td className="px-4 py-3 font-semibold text-slate-950">
-                        {formatTarget(row.target)}
-                      </td>
-                      <td className="px-4 py-3">
-                        <StatusBadge status={row.status} />
-                      </td>
-                      <td className="px-4 py-3 text-slate-700">{row.score}%</td>
-                      <td className="px-4 py-3 text-slate-700">
-                        {row.capsuleNumber}
-                      </td>
-                      <td className="px-4 py-3 text-slate-700">{row.summary}</td>
-                    </tr>
-                  ))}
+                  {flow.readinessRows.map((row) => {
+                    const isNotApplicable = row.status === "notApplicable";
+
+                    return (
+                      <tr
+                        key={row.target}
+                        className={isNotApplicable ? "opacity-60" : undefined}
+                      >
+                        <td className="px-4 py-3 font-semibold text-slate-950">
+                          {formatTarget(row.target)}
+                        </td>
+                        <td className="px-4 py-3">
+                          <StatusBadge status={row.status} />
+                        </td>
+                        <td className="px-4 py-3 text-slate-700">
+                          {isNotApplicable ? "—" : `${row.score}%`}
+                        </td>
+                        <td className="px-4 py-3 text-slate-700">
+                          {row.capsuleNumber}
+                        </td>
+                        <td className="px-4 py-3 text-slate-700">{row.summary}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -487,16 +495,21 @@ function Meta({ label, value }: { label: string; value: string }) {
 }
 
 function StatusBadge({ status }: { status: ReadinessStatus | string }) {
+  if (status === "notApplicable") {
+    return (
+      <span className="text-xs font-medium lowercase text-slate-500">n/a</span>
+    );
+  }
+
   const classes: Record<string, string> = {
     ready: "border-emerald-200 bg-emerald-50 text-emerald-800",
     warning: "border-amber-200 bg-amber-50 text-amber-800",
     blocked: "border-red-200 bg-red-50 text-red-800",
-    notApplicable: "border-slate-200 bg-slate-50 text-slate-700",
   };
 
   return (
     <span
-      className={`inline-flex w-fit rounded-md border px-2 py-1 text-xs font-semibold ${classes[status] ?? classes.notApplicable}`}
+      className={`inline-flex w-fit rounded-md border px-2 py-1 text-xs font-semibold ${classes[status] ?? "border-slate-200 bg-slate-50 text-slate-700"}`}
     >
       {formatStatus(status)}
     </span>

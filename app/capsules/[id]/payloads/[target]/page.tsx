@@ -160,13 +160,28 @@ export default async function PayloadPreviewPage({
           </Panel>
         </section>
 
-        <Panel title="AEB-Compatible JSON Preview" icon={FileJson}>
-          <pre className="max-h-[720px] overflow-auto bg-slate-950 p-5 text-xs leading-6 text-slate-100">
-            {JSON.stringify(preview, null, 2)}
-          </pre>
-        </Panel>
+        <RawJsonAccordion json={JSON.stringify(preview, null, 2)} />
       </main>
     </AppShell>
+  );
+}
+
+function RawJsonAccordion({ json }: { json: string }) {
+  return (
+    <details className="mt-6 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 border-b border-slate-200 px-5 py-4 text-base font-semibold text-slate-950 transition hover:bg-slate-50">
+        <span className="inline-flex items-center gap-2">
+          <FileJson aria-hidden="true" className="text-slate-500" size={18} />
+          Developer view
+        </span>
+        <span className="text-sm font-medium text-slate-500">
+          Show raw JSON payload
+        </span>
+      </summary>
+      <pre className="max-h-[720px] overflow-auto bg-slate-950 p-5 text-xs leading-6 text-slate-100">
+        {json}
+      </pre>
+    </details>
   );
 }
 
@@ -247,11 +262,19 @@ function IssueRow({
 }
 
 function StatusBadge({ status }: { status: ReadinessStatus }) {
+  if (status === "notApplicable") {
+    return (
+      <span className="inline-flex h-10 items-center text-sm font-medium lowercase text-slate-500">
+        n/a
+      </span>
+    );
+  }
+
   const classes: Record<ReadinessStatus, string> = {
     ready: "border-emerald-200 bg-emerald-50 text-emerald-800",
     warning: "border-amber-200 bg-amber-50 text-amber-800",
     blocked: "border-red-200 bg-red-50 text-red-800",
-    notApplicable: "border-slate-200 bg-slate-50 text-slate-700",
+    notApplicable: "",
   };
 
   return (
