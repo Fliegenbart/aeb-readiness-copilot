@@ -93,7 +93,7 @@ export default async function DemoPage({ searchParams }: DemoPageProps) {
   return (
     <AppShell>
       <main className="mx-auto w-full max-w-7xl px-5 py-7">
-        <section className="surface-in signal-sweep overflow-hidden rounded-2xl bg-slate-950 text-white shadow-xl shadow-slate-300/40">
+        <section className="surface-in signal-sweep overflow-hidden rounded-[28px] bg-slate-950 text-white shadow-[0_28px_80px_rgba(15,23,42,0.16)]">
           <div className="relative px-6 py-7 sm:px-8">
             <div className="absolute inset-0 data-plane opacity-95" />
             <div className="absolute bottom-0 left-0 h-1 w-2/3 bg-gradient-to-r from-teal-300 via-amber-200 to-transparent opacity-80" />
@@ -110,10 +110,31 @@ export default async function DemoPage({ searchParams }: DemoPageProps) {
                   from the seeded SQLite demo database.
                 </p>
               </div>
-              <p className="max-w-sm rounded-lg border border-amber-200/30 bg-amber-100/10 px-3 py-2 text-xs font-medium leading-5 text-amber-100">
-                Prototype only. Not legal, customs, sanctions or export-control
-                advice.
-              </p>
+              <div className="premium-panel-dark w-full max-w-sm rounded-2xl px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-200">
+                  Mock AEB adapter
+                </p>
+                <p className="mt-1 text-sm leading-6 text-slate-300">
+                  AEB-ready payload previews from seeded evidence.
+                </p>
+              </div>
+            </div>
+            <div className="relative mt-6 grid gap-3 sm:grid-cols-3">
+              {[
+                [String(data.kpis.evidenceCapsules), "capsules in scope"],
+                [String(data.kpis.openRemediationTasks), "live follow-ups"],
+                [String(data.kpis.contradictionsFound), "source conflicts"],
+              ].map(([value, label]) => (
+                <div
+                  key={label}
+                  className="premium-panel-dark rounded-2xl px-4 py-3"
+                >
+                  <p className="text-2xl font-semibold text-white">{value}</p>
+                  <p className="mt-1 text-xs uppercase tracking-[0.12em] text-slate-300">
+                    {label}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -124,7 +145,7 @@ export default async function DemoPage({ searchParams }: DemoPageProps) {
           ))}
         </section>
 
-        <section className="mt-5 rounded-xl border border-slate-200/80 bg-white/80 p-4 shadow-sm shadow-slate-200/40 backdrop-blur">
+        <section className="premium-panel mt-5 rounded-2xl p-4">
           <form
             className="grid gap-3 lg:grid-cols-[1fr_1fr_1fr_auto_auto]"
             action="/demo"
@@ -191,8 +212,8 @@ export default async function DemoPage({ searchParams }: DemoPageProps) {
           </form>
         </section>
 
-        <section className="mt-5 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm shadow-slate-200/40">
-          <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+        <section className="section-shell mt-5">
+          <div className="section-header-band flex items-center justify-between border-b border-slate-100 px-5 py-4">
             <div>
               <h2 className="text-lg font-semibold text-slate-950">
                 Evidence Capsules
@@ -209,8 +230,8 @@ export default async function DemoPage({ searchParams }: DemoPageProps) {
             <EmptyState hasFilters={activeFilterCount > 0} />
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[1160px] border-collapse text-left text-sm">
-                <thead className="bg-slate-50 text-xs uppercase tracking-[0.12em] text-slate-500">
+              <table className="table-chrome w-full min-w-[1160px] border-collapse text-left text-sm">
+                <thead className="text-xs uppercase tracking-[0.12em] text-slate-500">
                   <tr>
                     <th className="px-4 py-3 font-semibold">Capsule</th>
                     <th className="px-4 py-3 font-semibold">Customer</th>
@@ -225,7 +246,7 @@ export default async function DemoPage({ searchParams }: DemoPageProps) {
                 </thead>
                 <tbody className="divide-y divide-slate-200">
                   {data.capsules.map((capsule) => (
-                    <tr key={capsule.id} className="transition hover:bg-teal-50/35">
+                    <tr key={capsule.id}>
                       <td className="px-4 py-3">
                         <Link
                           href={`/capsules/${capsule.id}`}

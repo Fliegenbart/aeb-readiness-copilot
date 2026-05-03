@@ -99,13 +99,15 @@ export default async function CapsuleDetailPage({
           </div>
         </div>
 
-        <section className="mt-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="grid gap-6 lg:grid-cols-[1fr_auto]">
+        <section className="surface-in signal-sweep relative mt-6 overflow-hidden rounded-[28px] bg-slate-950 p-6 text-white shadow-[0_28px_80px_rgba(15,23,42,0.16)]">
+          <div className="absolute inset-0 data-plane opacity-90" />
+          <div className="absolute bottom-0 left-0 h-1 w-3/4 bg-gradient-to-r from-teal-300 via-amber-200 to-transparent opacity-80" />
+          <div className="relative grid gap-6 lg:grid-cols-[1fr_auto]">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-700">
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-200">
                 {capsule.capsuleNumber}
               </p>
-              <h1 className="mt-2 text-3xl font-semibold text-slate-950">
+              <h1 className="mt-2 text-3xl font-semibold text-white">
                 {capsule.title}
               </h1>
               <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-3">
@@ -113,8 +115,8 @@ export default async function CapsuleDetailPage({
                 <Meta label="Destination" value={capsule.destinationCountry} />
                 <Meta label="Incoterm" value={capsule.incoterm} />
               </dl>
-              <div className="mt-6 border-t border-slate-100 pt-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+              <div className="mt-6 border-t border-white/10 pt-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
                   Readiness across workflows
                 </p>
                 <div className="mt-3 overflow-x-auto pb-1">
@@ -122,16 +124,16 @@ export default async function CapsuleDetailPage({
                 </div>
               </div>
             </div>
-            <div className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 lg:min-w-56">
+            <div className="premium-panel-dark flex flex-col gap-3 rounded-2xl p-4 lg:min-w-64">
               <StatusBadge labelStyle="aviation" status={capsule.status} />
               <div
                 aria-label={`Overall score ${capsule.overallReadinessScore} percent. ${SCORE_THRESHOLD_TOOLTIP}`}
                 title={SCORE_THRESHOLD_TOOLTIP}
               >
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
                   Overall score
                 </p>
-                <p className="mt-1 text-4xl font-semibold text-slate-950">
+                <p className="mt-1 text-4xl font-semibold text-white">
                   {capsule.overallReadinessScore}%
                 </p>
                 <ScoreScale value={capsule.overallReadinessScore} />
@@ -142,8 +144,8 @@ export default async function CapsuleDetailPage({
 
         <Section title="AEB Readiness Matrix" icon={FileJson}>
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[960px] text-left text-sm">
-              <thead className="bg-slate-50 text-xs uppercase tracking-[0.12em] text-slate-500">
+            <table className="table-chrome w-full min-w-[960px] text-left text-sm">
+              <thead className="text-xs uppercase tracking-[0.12em] text-slate-500">
                 <tr>
                   <th className="px-4 py-3 font-semibold">Target workflow</th>
                   <th className="px-4 py-3 font-semibold">Status</th>
@@ -231,8 +233,8 @@ export default async function CapsuleDetailPage({
         <section className="mt-6 grid gap-6 xl:grid-cols-[1fr_0.9fr]">
           <Section title="Source Documents" icon={FileText}>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[720px] text-left text-sm">
-                <thead className="bg-slate-50 text-xs uppercase tracking-[0.12em] text-slate-500">
+              <table className="table-chrome w-full min-w-[720px] text-left text-sm">
+                <thead className="text-xs uppercase tracking-[0.12em] text-slate-500">
                   <tr>
                     <th className="px-4 py-3 font-semibold">Type</th>
                     <th className="px-4 py-3 font-semibold">Filename</th>
@@ -288,10 +290,10 @@ export default async function CapsuleDetailPage({
 function Meta({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+      <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
         {label}
       </dt>
-      <dd className="mt-1 font-semibold text-slate-950">{value}</dd>
+      <dd className="mt-1 font-semibold text-white">{value}</dd>
     </div>
   );
 }
@@ -301,7 +303,7 @@ function ScoreScale({ value }: { value: number }) {
 
   return (
     <div aria-hidden="true" className="mt-3">
-      <div className="relative h-2 overflow-visible rounded-full bg-slate-200">
+      <div className="relative h-2 overflow-visible rounded-full bg-white/15">
         <div
           className="absolute inset-y-0 left-0 rounded-l-full bg-red-300/70"
           style={{ width: "50%" }}
@@ -315,11 +317,11 @@ function ScoreScale({ value }: { value: number }) {
           style={{ width: "20%" }}
         />
         <span
-          className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white bg-slate-950 shadow-sm shadow-slate-400/50"
+          className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/80 bg-white shadow-sm shadow-slate-950/40"
           style={{ left: `${clampedValue}%` }}
         />
       </div>
-      <div className="mt-1 flex justify-between text-[10px] font-medium text-slate-400">
+      <div className="mt-1 flex justify-between text-[10px] font-medium text-slate-300">
         <span>0</span>
         <span>50</span>
         <span>80</span>
@@ -343,9 +345,9 @@ function Section({
   return (
     <section
       id={id}
-      className="mt-6 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm"
+      className="section-shell mt-6"
     >
-      <div className="flex items-center gap-2 border-b border-slate-200 px-5 py-4">
+      <div className="section-header-band flex items-center gap-2 border-b border-slate-200 px-5 py-4">
         <Icon aria-hidden="true" className="text-slate-500" size={18} />
         <h2 className="text-base font-semibold text-slate-950">{title}</h2>
       </div>

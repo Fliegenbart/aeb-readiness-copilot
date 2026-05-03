@@ -37,29 +37,34 @@ export function DashboardCard({
       value: "text-rose-950",
     },
     indigo: {
-      line: "from-indigo-500 to-sky-400",
-      icon: "bg-indigo-50 text-indigo-700 group-hover:bg-indigo-600",
-      value: "text-indigo-950",
+      line: "from-cyan-500 to-teal-400",
+      icon: "bg-cyan-50 text-cyan-700 group-hover:bg-cyan-600",
+      value: "text-cyan-950",
     },
   }[tone];
 
   return (
-    <article className="group relative overflow-hidden rounded-xl border border-slate-200/80 bg-white/85 p-5 shadow-sm shadow-slate-200/40 backdrop-blur transition duration-200 hover:-translate-y-1 hover:bg-white hover:shadow-lg hover:shadow-slate-300/40">
+    <article className="premium-panel group relative overflow-hidden rounded-2xl p-5 transition duration-200 hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(15,23,42,0.1)]">
       <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${tones.line}`} />
+      <div className="precision-hatch absolute inset-y-0 right-0 w-20 opacity-60 transition duration-200 group-hover:opacity-90" />
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
             {title}
           </p>
-          <p className={`mt-4 text-4xl font-semibold tracking-normal tabular-nums ${tones.value}`}>
+          <p
+            className={`mt-4 text-4xl font-semibold tracking-normal tabular-nums ${tones.value}`}
+          >
             {value}
           </p>
         </div>
-        <div className={`rounded-lg p-2 transition ${tones.icon} group-hover:text-white`}>
+        <div
+          className={`rounded-xl p-2.5 shadow-sm transition ${tones.icon} group-hover:text-white`}
+        >
           <Icon aria-hidden="true" size={22} />
         </div>
       </div>
-      <p className="mt-4 text-sm leading-6 text-slate-600">{detail}</p>
+      <p className="mt-4 max-w-[24ch] text-sm leading-6 text-slate-600">{detail}</p>
     </article>
   );
 }

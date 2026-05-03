@@ -52,7 +52,7 @@ export default async function PitchPage() {
     <AppShell>
       <main className="mx-auto grid w-full max-w-7xl gap-7 px-5 py-7 lg:grid-cols-[292px_1fr]">
         <aside className="order-2 lg:sticky lg:top-24 lg:order-1 lg:self-start">
-          <div className="overflow-hidden rounded-xl border border-slate-200/80 bg-white/80 shadow-sm shadow-slate-200/50 backdrop-blur">
+          <div className="premium-panel overflow-hidden rounded-2xl">
             <div className="border-b border-slate-100 p-5">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">
                 Guided partner demo
@@ -87,8 +87,8 @@ export default async function PitchPage() {
             </nav>
             <div className="border-t border-slate-100 p-4">
               <div className="rounded-lg bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-950">
-                Prototype only. Uses mock AEB adapters for AEB-adjacent workflow
-                previews.
+                Mock AEB adapters only. Payload previews are designed for
+                AEB-adjacent workflow preparation.
               </div>
               <form action={resetPitchDemoDataAction} className="mt-3">
                 <button className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-slate-950 px-3 text-sm font-semibold text-white transition hover:bg-teal-800">
@@ -101,7 +101,7 @@ export default async function PitchPage() {
         </aside>
 
         <div className="order-1 min-w-0 lg:order-2">
-          <section className="surface-in signal-sweep overflow-hidden rounded-2xl bg-slate-950 text-white shadow-xl shadow-slate-300/40">
+          <section className="surface-in signal-sweep overflow-hidden rounded-[28px] bg-slate-950 text-white shadow-[0_28px_80px_rgba(15,23,42,0.16)]">
             <div className="relative grid min-h-[430px] gap-8 px-6 py-8 sm:px-8 lg:grid-cols-[1fr_320px] lg:items-end lg:p-10">
               <div className="absolute inset-0 opacity-70">
                 <div className="h-full w-full data-plane" />
@@ -143,7 +143,7 @@ export default async function PitchPage() {
                   </Link>
                 </div>
               </div>
-              <div className="relative rounded-xl border border-white/10 bg-white/10 p-5 backdrop-blur">
+              <div className="premium-panel-dark relative rounded-2xl p-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-200">
                   Demo capsule
                 </p>
@@ -218,8 +218,8 @@ export default async function PitchPage() {
             summary="The capsule preserves where each value came from, what was normalized and how confident the extraction is."
           >
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px] text-left text-sm">
-                <thead className="bg-slate-50 text-xs uppercase tracking-[0.12em] text-slate-500">
+              <table className="table-chrome w-full min-w-[900px] text-left text-sm">
+                <thead className="text-xs uppercase tracking-[0.12em] text-slate-500">
                   <tr>
                     <th className="px-4 py-3 font-semibold">Field</th>
                     <th className="px-4 py-3 font-semibold">Raw value</th>
@@ -259,8 +259,8 @@ export default async function PitchPage() {
             summary="The same evidence can be ready for one workflow, warning for another and blocked for a third."
           >
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[980px] text-left text-sm">
-                <thead className="bg-slate-50 text-xs uppercase tracking-[0.12em] text-slate-500">
+              <table className="table-chrome w-full min-w-[980px] text-left text-sm">
+                <thead className="text-xs uppercase tracking-[0.12em] text-slate-500">
                   <tr>
                     <th className="px-4 py-3 font-semibold">AEB target workflow</th>
                     <th className="px-4 py-3 font-semibold">Status</th>

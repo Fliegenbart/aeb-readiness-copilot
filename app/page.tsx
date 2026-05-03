@@ -26,9 +26,13 @@ export default function Home() {
   return (
     <AppShell>
       <main className="mx-auto flex min-h-[calc(100vh-96px)] w-full max-w-7xl flex-col px-5 py-7">
-        <section className="surface-in signal-sweep relative grid flex-1 overflow-hidden rounded-2xl bg-slate-950 text-white shadow-xl shadow-slate-300/40 lg:grid-cols-[1.05fr_0.95fr]">
+        <section className="surface-in signal-sweep relative grid flex-1 overflow-hidden rounded-[28px] bg-slate-950 text-white shadow-[0_28px_80px_rgba(15,23,42,0.16)] lg:grid-cols-[1.05fr_0.95fr]">
           <div className="absolute inset-0 data-plane opacity-80" />
           <div className="absolute bottom-0 left-0 h-1 w-3/4 bg-gradient-to-r from-teal-300 via-amber-200 to-transparent opacity-80" />
+          <div className="absolute inset-y-8 left-5 hidden w-px bg-teal-200/30 lg:block" />
+          <p className="dossier-rail absolute left-7 top-12 hidden text-[10px] font-semibold uppercase tracking-[0.28em] text-teal-200/70 lg:block">
+            Evidence dossier
+          </p>
 
           <div className="relative max-w-3xl px-6 py-12 sm:px-9 lg:py-16">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-200">
@@ -68,11 +72,11 @@ export default function Home() {
           {workflowHighlights.map((item) => (
             <article
               key={item.title}
-              className="group rounded-xl border border-slate-200/80 bg-white/85 p-5 shadow-sm shadow-slate-200/40 backdrop-blur transition hover:-translate-y-1 hover:bg-white hover:shadow-lg hover:shadow-slate-300/40"
+              className="premium-panel group rounded-2xl p-5 transition hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(15,23,42,0.1)]"
             >
               <item.icon
                 aria-hidden="true"
-                className="text-teal-700 transition group-hover:text-slate-950"
+                className="text-teal-700 transition group-hover:scale-105 group-hover:text-slate-950"
                 size={22}
               />
               <h2 className="mt-4 text-base font-semibold text-slate-950">

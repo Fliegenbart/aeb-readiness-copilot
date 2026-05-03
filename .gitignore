@@ -40,4 +40,7 @@ coverage
 
 # local screenshots
 screenshots/
+.playwright-mcp/
+dev.db
+dev.db-journal
 .vercel

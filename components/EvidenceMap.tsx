@@ -149,7 +149,7 @@ export function EvidenceMap({ fields }: { fields: EvidenceMapField[] }) {
           <section key={group.id}>
             <button
               aria-expanded={!isCollapsed}
-              className="flex w-full items-center justify-between gap-4 bg-slate-50 px-5 py-3 text-left transition hover:bg-slate-100/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-600"
+              className="section-header-band flex w-full items-center justify-between gap-4 px-5 py-3 text-left transition hover:bg-slate-100/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-600"
               onClick={() => toggleGroup(group.id)}
               type="button"
             >
@@ -176,8 +176,8 @@ export function EvidenceMap({ fields }: { fields: EvidenceMapField[] }) {
 
             {!isCollapsed ? (
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[980px] text-left text-sm">
-                  <thead className="bg-white text-xs uppercase tracking-[0.12em] text-slate-500">
+                <table className="table-chrome w-full min-w-[980px] text-left text-sm">
+                  <thead className="text-xs uppercase tracking-[0.12em] text-slate-500">
                     <tr>
                       <th className="px-4 py-3 font-semibold">Field</th>
                       <th className="px-4 py-3 font-semibold">Value</th>
